@@ -277,6 +277,7 @@ def copy_layer(obj):
     lyr = Layer(obj.name)
     lyr.title = obj.title
     # only if mapnik version supports it
+    # http://trac.mapnik.org/ticket/503
     if hasattr(lyr, 'tolerance'):
         lyr.tolerance = obj.tolerance
         lyr.toleranceunits = obj.toleranceunits
