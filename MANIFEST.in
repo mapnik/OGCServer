@@ -1,0 +1,3 @@
+include *.txt
+include setup.py
+recursive-include ogcserver  *.py
