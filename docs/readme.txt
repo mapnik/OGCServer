@@ -1,3 +1,5 @@
+# $Id: readme.txt 1186 2009-06-29 00:11:14Z dane $
+
 Mapnik OGC Server
 -----------------
 
@@ -20,7 +22,7 @@ Features
 --------
 
 - WMS 1.1.1 and 1.3.0
-- CGI/FastCGI, WSGI, mod_python 
+- CGI/FastCGI, WSGI, mod_python
 - Supports all 3 requests: GetCapabilities, GetMap and GetFeatureInfo
 - JPEG/PNG output
 - XML/INIMAGE/BLANK error handling
@@ -62,7 +64,7 @@ Installation
 
 - Test that the server code is available and installed properly by importing it within a
   python interpreter::
-  
+
   >>> from mapnik import ogcserver
   >>> # no error means proper installation
 
@@ -77,27 +79,27 @@ Configuring the server
 
 - You will need to create two simple python scripts:
 
-  1) The web-accessible python script ('wms.py') which will import the 
+  1) The web-accessible python script ('wms.py') which will import the
      ogcserver module code and associate itself with the 'ogcserver.conf'
      configuration file. The code of this script will depend upon whether
      you deploy the server as cgi/fastcgi/wsgi/mod_python. See the Mapnik
      Community Wiki for examples: http://trac.mapnik.org/wiki/OgcServer and
      see the cgi sample in the /utils/ogcserver folder.
-     
+
   2) A 'map_factory' script which loads your layers and styles. Samples of this
      script can be found below.
 
-  
+
 - Next you need to edit the ogcserver.conf file to:
-  
+
   1) Point to the 'map_factory' script by using the "module" parameter
 
   2) Fill out further settings for the server.
-    
+
   Edit the configuration file to your liking, the comments within the file will
   help you further.  Be sure to, at the very minimum, edit the "module"
   parameter. The server will not work without setting it properly first.
-  
+
 
 Defining Layers and Styles
 --------------------------
@@ -106,14 +108,14 @@ The ogcserver obviously needs layers to publish and styles for how to display th
 
 You create your layers and styles in the 'map_factory' script.
 
-For now this can be done by either loading an XML mapfile inside that script using the 
+For now this can be done by either loading an XML mapfile inside that script using the
 'loadXML()' function or by writing your layers and styles in python code, or both.
 
 If you load your layers and styles using an existing XML mapfile the 'map_factory' module
 should look like::
 
   from mapnik.ogcserver.WMS import BaseWMSFactory
-  
+
   class WMSFactory(BaseWMSFactory):
     def __init__(self):
       BaseWMSFactory.__init__(self)
@@ -127,8 +129,8 @@ have a 'map_factory' more like::
   from mapnik import *
 
   SHAPEFILE = '/path/to/world_borders.shp'
-  PROJ4_STRING = '+init=epsg:4326'  
-  
+  PROJ4_STRING = '+init=epsg:4326'
+
   class WMSFactory(BaseWMSFactory):
     def __init__(self):
       BaseWMSFactory.__init__(self)
@@ -144,7 +146,7 @@ have a 'map_factory' more like::
       lyr.abstract = 'Country Borders of the World'
       self.register_layer(lyr,'world_style',('world_style',))
       self.finalize()
-    
+
 The rules for writing this class are:
 
 - It MUST be called 'WMSFactory'.
@@ -160,7 +162,7 @@ The rules for writing this class are:
   object.
 - DO NOT register styles using layer.styles.append(), instead, provide style
   information to the register_layer() call::
-  
+
     register_layer(layerobject, defaultstylename, (tuple of alternative style names,))
 
 - No Map() object is used or needed here.
@@ -168,9 +170,42 @@ The rules for writing this class are:
   validate everything and let you know if there are any problems.
 - For a layer to be queryable via GetFeatureInfo, simply set the 'queryable'
   property to True::
-  
+
     lyr.queryable = True
 
+
+Paster applications
+-------------------
+You may want to integrate your ogcserver services in a WSGI pipeline configured through PasteDeploy.
+You have already in this package some factories availables:
+
+-:factory: ogcserver#wms_factory (ogcserver.wsgi.ogcserver_wms_factory
+
+    -:ogcserver_config: ogcserver.conf configuration file (see conf/ogcserver.conf for a sample one)
+    -:server_module: module to get WMSFactory from
+    -:debug: (opt) debug flag (true/false)
+    -:fonts: (opt) system fonts dir
+    -:maxage: (opt) proxy max age (seconds)
+    -:example: ::
+
+        [myapp]
+        use=egg:ogcserver#mapfile
+        mapfile=/path/to/mapfile
+        ogcserver_config=/path/to/ogcserver.conf
+
+:factory: ogcserver#mapfile (ogcserver.wsgi.ogcserver_map_factory
+
+    -:ogcserver_config: ogcserver.conf configuration file (see conf/ogcserver.conf for a sample one)
+    -:mapfile: map file (see conf/ogcserver.conf for a sample one)
+    -:debug: (opt) debug flag (true/false)
+    -:fonts: (opt) system fonts dir
+    -:maxage: (opt) proxy max age (seconds)
+    -:example: ::
+
+         [myapp]
+         use=egg:ogcserver#wms_factory
+         server_module=my.nice.appmaker.module
+         ogcserver_config=/path/to/ogcserver.conf
 
 To Do
 -----

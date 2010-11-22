@@ -2,10 +2,12 @@
 
 try:
     from setuptools import setup
-except:
+    HAS_SETUPTOOLS = True
+except ImportError:
     from distutils.core import setup
+    HAS_SETUPTOOLS = False
 
-setup(name='ogcserver',
+options = dict(name='ogcserver',
     version='0.1.0',
     description="A OGC WMS for Mapnik",
     #long_description="TODO",
@@ -29,3 +31,35 @@ setup(name='ogcserver',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Utilities'],
 )
+
+if HAS_SETUPTOOLS:
+    options.update(dict(entry_points={
+        'paste.app_factory': ['mapfile=ogcserver.wsgi:ogcserver_map_factory',
+                              'wms_factory=ogcserver.wsgi:ogcserver_wms_factory',
+                             ],
+    },
+    install_requires = ['setuptools', 'PasteScript', 'WebOb', 'lxml', 'PIL']
+    ))
+
+setup(**options)
+
+if not HAS_SETUPTOOLS:
+    warning = '\n***Warning*** ogcserver also requires'
+    missing = False
+    try:
+        import PIL
+        # todo import Image ?
+    except:
+        try:
+            import Image
+        except:
+            missing = True
+            warning +=' PIL (easy_install PIL)'
+    try:
+        import lxml
+    except:
+        missing = True
+        warning +' lxml (easy_install lxml)'
+    if missing:
+        sys.stderr.write('%s\n' % warning)
+
