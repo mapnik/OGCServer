@@ -1,5 +1,3 @@
-# $Id: readme.txt 2324 2010-11-08 21:37:16Z dane $
-
 Mapnik OGC Server
 -----------------
 
