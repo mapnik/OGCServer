@@ -1,0 +1,126 @@
+= OGC Server =
+
+== Overview ==
+This page dicusses all things related to supporting [http://www.opengeospatial.org/ OpenGeospatial Consortium (OGC)] server related specifications in Mapnik.
+
+As of 0.3.0, Mapnik provides an beta [http://www.opengeospatial.org/standards/wms Web Mapping Service (WMS)] compliant server, written in Python.
+
+== Features ==
+Supports both versions [http://portal.opengeospatial.org/files/?artifact_id=1081&version=1&format=pdf 1.1.1] and [http://portal.opengeospatial.org/modules/admin/license_agreement.php?suppressHeaders=0&access_license_id=3&target=http://portal.opengeospatial.org/files/index.php?artifact_id=14416 1.3.0] of the specification.
+
+Supports all operations:
+
+ * !GetCapabilities
+ * !GetMap
+ * !GetFeatureInfo (As of 0.4.0)
+
+Supports defining styles and layers in python and by loading an xml mapfile (as of 0.6.0)
+
+It can be configured to be run within a webserver as either:
+ * CGI
+ * FastCGI
+ * WSGI
+ * mod_python (as of 0.6.0)
+
+Or can be run as a local process using a [http://docs.python.org/library/wsgiref.html wsgiref localserver]
+
+'''See below for Sample configurations'''
+
+== Dependencies ==
+ * Python
+ * Mapnik installed with Python Bindings
+ * Proj4 epsg file with all needed customs projections added (ie. google mercator)
+ * [http://codespeak.net/lxml/index.html lxml] (Optional as of 0.6.1 -if not present will fall back on built-in xml lib)
+ * [http://www.pythonware.com/products/pil/ PIL (Python Imaging Library)]
+ * For running as CGI or FastCGI:
+   * [http://jonpy.sourceforge.net/ jonpy]
+
+== Installation ==
+ * The server code is automatically installed in the Python site-packages folder along with the Mapnik Python bindings.
+ * To test installation try importing the ogcserver module within a python interpreter:
+
+    >>> from mapnik import ogcserver
+    >>> # no error means proper installation
+
+ * To test that your Proj4 'epsg' file can be located choose and EPSG code your server will be exposing, say EPSG 4326 (WGS 84) or EPSG 900913 (Google Mercator), try instantiating from the Mapnik python bindings:
+
+    >>> from mapnik import Projection
+    >>> Projection('+init=epsg:4326')
+    Projection('+init=epsg:4326')
+    >>> Projection('+init=epsg:900913')
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    RuntimeError: failed to initialize projection with:+init=epsg:900913
+
+ * In this example 4236 was found, but 900913 needs to be manually added to the 'epsg' file usually located at /usr/share/proj/epsg.  On Mac OS X if you installed the PROJ framework from [http://www.kyngchaos.com/software/frameworks KyngChaos Wiki] the location will be at /Library/Frameworks/PROJ.framework/resources/proj.
+
+    <900913> +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs  <>
+
+== Setup ==
+See the OgcServerSvn (Web-based view of the document available in the mapnik source code [http://trac.mapnik.org/browser/trunk/docs/ogcserver/readme.txt here])
+
+=== Sample Configurations ===
+
+Usually this file is named 'wms.py':
+
+    import sys
+    from mapnik.ogcserver.wsgi import WSGIApp
+    sys.path.append('/path/to/map_factory/')
+    
+    application = WSGIApp('/path/to/ogcserver.conf')
+
+ * To run the WSGI as a standalone server do:
+
+    # add these line to the bottom of your wsgi-based 'wms.py'
+    
+    if __name__ == '__main__':
+        from wsgiref.simple_server import make_server
+        httpd = make_server('localhost', 8000, application)
+        print "Listening on port 8000...."
+        httpd.serve_forever()
+ * And then do:
+
+    $ python wms.py
+    Listening on port 8000.... # go to http://localhost:8000 in your browser
+
+'''CGI/FastCGI'''
+
+    import sys
+    from mapnik.ogcserver.cgiserver import Handler
+    sys.path.append('/path/to/map_factory/')
+    from jon import fcgi
+    
+    class OGCServerHandler(Handler):
+        configpath = '/path/to/ogcserver.conf'
+    
+    fcgi.Server({fcgi.FCGI_RESPONDER: OGCServerHandler}).run()
+
+'''Mod Python'''
+
+Note that the mod_python environment keeps Python code in memory, so after making changes to worldMapServer.py or other files, an Apache reload or restart may be required.
+
+''wms.py''
+
+    import sys
+    from mapnik.ogcserver.modserver import ModHandler
+    sys.path.append('/path/to/map_factory/')
+    
+    handler = ModHandler('/path/to/ogcserver.conf')
+
+''Apache Configuration''
+
+    <Directory "/home/dane/projects/ogcserver/">
+      PythonPath "['/home/dane/projects/ogcserver/'] + sys.path"
+      AddHandler mod_python .py
+      PythonHandler wms
+    </Directory>
+
+=== Plans for the future ===
+
+ * Test with various WMS clients 
+ * Add support for text/xml and text/html to !GetFeatureInfo (only supports text/plain in 0.4.0)
+ * Investigate [http://wiki.osgeo.org/wiki/WMS_Tiling_Client_Recommendation WMS-C] integration
+
+=== History ===
+
+For a bit of history on the server development see: http://lists.berlios.de/pipermail/mapnik-devel/2006-April/000011.html
