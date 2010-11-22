@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE Map>
+<Map srs="+init=epsg:23031" buffer_size="128">
+
+<Style name="Càsaïñ">
+<Rule>
+	<PolygonSymbolizer>
+		<CssParameter name="fill">#bee8ff</CssParameter>
+		<CssParameter name="fill-opacity">0.5</CssParameter>
+	</PolygonSymbolizer>
+</Rule>
+</Style>
+
+<Layer name="Càsaïñ" title="Càsaïñ">
+	<StyleName>Càsaïñ</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+</Map>
