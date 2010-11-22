@@ -1,28 +1,46 @@
 """WSGI application wrapper for Mapnik OGC WMS Server."""
 
-from exceptions import OGCException, ServerConfigurationError
-from configparser import SafeConfigParser
 from cgi import parse_qs
-from wms111 import ExceptionHandler as ExceptionHandler111
-from wms130 import ExceptionHandler as ExceptionHandler130
-from common import Version
+
+try:
+    import mapnik2 as mapnik
+except ImportError:
+    import mapnik
+
+from ogcserver.common import Version
+from ogcserver.WMS import BaseWMSFactory
+from ogcserver.configparser import SafeConfigParser
+from ogcserver.wms111 import ExceptionHandler as ExceptionHandler111
+from ogcserver.wms130 import ExceptionHandler as ExceptionHandler130
+from ogcserver.exceptions import OGCException, ServerConfigurationError
 
 class WSGIApp:
 
-    def __init__(self, configpath):
+    def __init__(self, configpath, mapfile=None,fonts=None,home_html=None):
         conf = SafeConfigParser()
         conf.readfp(open(configpath))
+        # TODO - be able to supply in config as well
+        self.home_html = home_html
         self.conf = conf
-        if not conf.has_option_with_value('server', 'module'):
-            raise ServerConfigurationError('The factory module is not defined in the configuration file.')
-        try:
-            mapfactorymodule = __import__(conf.get('server', 'module'))
-        except ImportError:
-            raise ServerConfigurationError('The factory module could not be loaded.')
-        if hasattr(mapfactorymodule, 'WMSFactory'):
-            self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')()
+        if fonts:
+            mapnik.register_fonts(fonts)
+        if mapfile:
+            wms_factory = BaseWMSFactory()
+            # TODO - add support for Cascadenik MML
+            wms_factory.loadXML(mapfile)
+            wms_factory.finalize()
+            self.mapfactory = wms_factory
         else:
-            raise ServerConfigurationError('The factory module does not have a WMSFactory class.')
+            if not conf.has_option_with_value('server', 'module'):
+                raise ServerConfigurationError('The factory module is not defined in the configuration file.')
+            try:
+                mapfactorymodule = __import__(conf.get('server', 'module'))
+            except ImportError:
+                raise ServerConfigurationError('The factory module could not be loaded.')
+            if hasattr(mapfactorymodule, 'WMSFactory'):
+                self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')()
+            else:
+                raise ServerConfigurationError('The factory module does not have a WMSFactory class.')
         if conf.has_option('server', 'debug'):
             self.debug = int(conf.get('server', 'debug'))
         else:
@@ -34,9 +52,16 @@ class WSGIApp:
 
     def __call__(self, environ, start_response):
         reqparams = {}
+        base = True
         for key, value in parse_qs(environ['QUERY_STRING'], True).items():
             reqparams[key.lower()] = value[0]
-        onlineresource = 'http://%s:%s%s?' % (environ['SERVER_NAME'], environ['SERVER_PORT'], environ['PATH_INFO'])
+            base = False
+        server_port = environ['SERVER_PORT']
+        if server_port == '80':
+            port = ''
+        else:
+            port = ':%s' % server_port
+        onlineresource = 'http://%s%s%s%s?' % (environ['SERVER_NAME'],port,environ['SCRIPT_NAME'],environ['PATH_INFO'])
         try:
             if not reqparams.has_key('request'):
                 raise OGCException('Missing request parameter.')
@@ -47,14 +72,18 @@ class WSGIApp:
             if request in ['GetMap', 'GetFeatureInfo']:
                 service = 'WMS'
             else:
-                service = reqparams['service']
+                try:
+                    service = reqparams['service']
+                except:
+                    service = 'WMS'
+                    request = 'GetCapabilities'
             if reqparams.has_key('service'):
                 del reqparams['service']
             try:
-                mapnikmodule = __import__('mapnik2.ogcserver.' + service)
+                ogcserver = __import__('ogcserver.' + service)
             except:
                 raise OGCException('Unsupported service "%s".' % service)
-            ServiceHandlerFactory = getattr(mapnikmodule.ogcserver, service).ServiceHandlerFactory
+            ServiceHandlerFactory = getattr(ogcserver, service).ServiceHandlerFactory
             servicehandler = ServiceHandlerFactory(self.conf, self.mapfactory, onlineresource, reqparams.get('version', None))
             if reqparams.has_key('version'):
                 del reqparams['version']
@@ -65,17 +94,22 @@ class WSGIApp:
                 requesthandler = getattr(servicehandler, request)
             except:
                 raise OGCException('Operation "%s" not supported.' % request, 'OperationNotSupported')
+
+            # stick the user agent in the request params
+            # so that we can add ugly hacks for specific buggy clients
+            ogcparams['HTTP_USER_AGENT'] = environ['HTTP_USER_AGENT']
+
             response = requesthandler(ogcparams)
         except:
             version = reqparams.get('version', None)
             if not version:
-                version = Version('1.3.0')
+                version = Version()
             else:
                 version = Version(version)
             if version >= '1.3.0':
-                eh = ExceptionHandler130(self.debug)
+                eh = ExceptionHandler130(self.debug,base,self.home_html)
             else:
-                eh = ExceptionHandler111(self.debug)
+                eh = ExceptionHandler111(self.debug,base,self.home_html)
             response = eh.getresponse(reqparams)
         response_headers = [('Content-Type', response.content_type),('Content-Length', str(len(response.content)))]
         if self.max_age:

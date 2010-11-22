@@ -2,11 +2,12 @@
 
 import sys
 from mod_python import apache, util
-from exceptions import OGCException, ServerConfigurationError
-from wms111 import ExceptionHandler as ExceptionHandler111
-from wms130 import ExceptionHandler as ExceptionHandler130
-from configparser import SafeConfigParser
-from common import Version
+
+from ogcserver.common import Version
+from ogcserver.configparser import SafeConfigParser
+from ogcserver.wms111 import ExceptionHandler as ExceptionHandler111
+from ogcserver.wms130 import ExceptionHandler as ExceptionHandler130
+from ogcserver.exceptions import OGCException, ServerConfigurationError
 
 
 class ModHandler(object):
@@ -57,10 +58,10 @@ class ModHandler(object):
                 if reqparams.has_key('service'):
                     del reqparams['service']
                 try:
-                    mapnikmodule = __import__('mapnik2.ogcserver.' + service)
+                    ogcserver = __import__('ogcserver.' + service)
                 except:
                     raise OGCException('Unsupported service "%s".' % service)
-                ServiceHandlerFactory = getattr(mapnikmodule.ogcserver, service).ServiceHandlerFactory
+                ServiceHandlerFactory = getattr(ogcserver, service).ServiceHandlerFactory
                 servicehandler = ServiceHandlerFactory(self.conf, self.mapfactory, onlineresource, reqparams.get('version', None))
                 if reqparams.has_key('version'):
                     del reqparams['version']
@@ -91,7 +92,7 @@ class ModHandler(object):
         reqparams = lowerparams(util.FieldStorage(apacheReq))
         version = reqparams.get('version', None)
         if not version:
-            version = Version('1.3.0')
+            version = Version()
         else:
             version = Version(version)
         if version >= '1.3.0':

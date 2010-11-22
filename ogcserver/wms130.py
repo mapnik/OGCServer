@@ -1,23 +1,22 @@
 """WMS 1.3.0 compliant GetCapabilities, GetMap, GetFeatureInfo, and Exceptions interface."""
 
-from common import ParameterDefinition, Response, Version, ListFactory, \
-                   ColorFactory, CRSFactory, CRS, WMSBaseServiceHandler, \
-                   BaseExceptionHandler, Projection, Box2d
-from exceptions import OGCException, ServerConfigurationError
-from mapnik2 import Coord
-
 try:
-    from lxml import etree as ElementTree
+    from mapnik2 import Coord
 except ImportError:
-    import xml.etree.ElementTree as ElementTree
-except ImportError:
-    import elementtree.ElementTree as ElementTree
+    from mapnik import Coord
+
+from lxml import etree as ElementTree
+
+from ogcserver.common import ParameterDefinition, Response, Version, ListFactory, \
+                   ColorFactory, CRSFactory, CRS, WMSBaseServiceHandler, \
+                   BaseExceptionHandler, Projection, Envelope, to_unicode
+from ogcserver.exceptions import OGCException, ServerConfigurationError
 
 class ServiceHandler(WMSBaseServiceHandler):
 
     SERVICE_PARAMS = {
         'GetCapabilities': {
-            'format': ParameterDefinition(False, str, 'text/xml', ('text/xml',), True),
+            'format': ParameterDefinition(False, str, 'text/xml', ('text/xml',)),
             'updatesequence': ParameterDefinition(False, str)
         },
         'GetMap': {
@@ -27,10 +26,10 @@ class ServiceHandler(WMSBaseServiceHandler):
             'bbox': ParameterDefinition(True, ListFactory(float)),
             'width': ParameterDefinition(True, int),
             'height': ParameterDefinition(True, int),
-            'format': ParameterDefinition(True, str, allowedvalues=('image/png', 'image/jpeg')),
-            'transparent': ParameterDefinition(False, str, 'FALSE', ('TRUE', 'FALSE')),
+            'format': ParameterDefinition(True, str, allowedvalues=('image/png','image/png8', 'image/jpeg')),
+            'transparent': ParameterDefinition(False, str, 'FALSE', ('TRUE', 'FALSE','true','True','false','False')),
             'bgcolor': ParameterDefinition(False, ColorFactory, ColorFactory('0xFFFFFF')),
-            'exceptions': ParameterDefinition(False, str, 'XML', ('XML', 'INIMAGE', 'BLANK','HTML')),
+            'exceptions': ParameterDefinition(False, str, 'XML', ('XML', 'INIMAGE', 'BLANK','HTML'),True),
         },
         'GetFeatureInfo': {
             'layers': ParameterDefinition(True, ListFactory(str)),
@@ -40,14 +39,16 @@ class ServiceHandler(WMSBaseServiceHandler):
             'width': ParameterDefinition(True, int),
             'height': ParameterDefinition(True, int),
             'format': ParameterDefinition(False, str, allowedvalues=('image/png', 'image/jpeg')),
-            'transparent': ParameterDefinition(False, str, 'FALSE', ('TRUE', 'FALSE')),
+            'transparent': ParameterDefinition(False, str, 'FALSE', ('TRUE', 'FALSE','true','True','false','False')),
             'bgcolor': ParameterDefinition(False, ColorFactory, ColorFactory('0xFFFFFF')),
-            'exceptions': ParameterDefinition(False, str, 'XML', ('XML', 'INIMAGE', 'BLANK','HTML')),
+            'exceptions': ParameterDefinition(False, str, 'XML', ('XML', 'INIMAGE', 'BLANK','HTML'),True),
             'query_layers': ParameterDefinition(True, ListFactory(str)),
             'info_format': ParameterDefinition(True, str, allowedvalues=('text/plain', 'text/xml')),
             'feature_count': ParameterDefinition(False, int, 1),
-            'i': ParameterDefinition(True, float),
-            'j': ParameterDefinition(True, float)
+            'i': ParameterDefinition(False, float),
+            'j': ParameterDefinition(False, float),
+            'y': ParameterDefinition(False, float),
+            'x': ParameterDefinition(False, float)
         }
     }
 
@@ -85,6 +86,7 @@ class ServiceHandler(WMSBaseServiceHandler):
           </GetCapabilities>
           <GetMap>
             <Format>image/png</Format>
+            <Format>image/png8</Format>
             <Format>image/jpeg</Format>
             <DCPType>
               <HTTP>
@@ -109,6 +111,7 @@ class ServiceHandler(WMSBaseServiceHandler):
           <Format>XML</Format>
           <Format>INIMAGE</Format>
           <Format>BLANK</Format>
+          <Format>HTML</Format>
         </Exception>
         <Layer>
           <Title>A Mapnik WMS Server</Title>
@@ -148,7 +151,7 @@ class ServiceHandler(WMSBaseServiceHandler):
             for layer in self.mapfactory.ordered_layers:
                 layerproj = Projection(layer.srs)
                 layername = ElementTree.Element('Name')
-                layername.text = layer.name
+                layername.text = to_unicode(layer.name)
                 env = layer.envelope()
                 layerexgbb = ElementTree.Element('EX_GeographicBoundingBox')
                 ll = layerproj.inverse(Coord(env.minx, env.miny))
@@ -173,14 +176,18 @@ class ServiceHandler(WMSBaseServiceHandler):
                 layerbbox.set('maxy', str(env.maxy))
                 layere = ElementTree.Element('Layer')
                 layere.append(layername)
+                layertitle = ElementTree.Element('Title')
                 if layer.title:
-                    layertitle = ElementTree.Element('Title')
-                    layertitle.text = layer.title
-                    layere.append(layertitle)
+                    layertitle.text = to_unicode(layer.title)
+                else:
+                    layertitle.text = to_unicode(layer.name)                    
+                layere.append(layertitle)
+                layerabstract = ElementTree.Element('Abstract')
                 if layer.abstract:
-                    layerabstract = ElementTree.Element('Abstract')
-                    layerabstract.text = layer.abstract
-                    layere.append(layerabstract)
+                    layerabstract.text = to_unicode(layer.abstract)
+                else:
+                    layerabstract.text = 'no abstract'                
+                layere.append(layerabstract)
                 if layer.queryable:
                     layere.set('queryable', '1')
                 layere.append(layerexgbb)
@@ -189,14 +196,14 @@ class ServiceHandler(WMSBaseServiceHandler):
                     for extrastyle in [layer.wmsdefaultstyle] + list(layer.wmsextrastyles):
                         style = ElementTree.Element('Style')
                         stylename = ElementTree.Element('Name')
-                        stylename.text = extrastyle
+                        stylename.text = to_unicode(extrastyle)
                         styletitle = ElementTree.Element('Title')
-                        styletitle.text = extrastyle
+                        styletitle.text = to_unicode(extrastyle)
                         style.append(stylename)
                         style.append(styletitle)
                         layere.append(style)
                 rootlayerelem.append(layere)
-            self.capabilities = '<?xml version="1.0" encoding="UTF-8"?>' + ElementTree.tostring(capetree)
+            self.capabilities = '<?xml version="1.0" encoding="UTF-8"?>' + ElementTree.tostring(capetree,pretty_print=True)
         response = Response('text/xml', self.capabilities)
         return response
 
@@ -204,20 +211,37 @@ class ServiceHandler(WMSBaseServiceHandler):
         if params['width'] > int(self.conf.get('service', 'maxwidth')) or params['height'] > int(self.conf.get('service', 'maxheight')):
             raise OGCException('Requested map size exceeds limits set by this server.')
         return WMSBaseServiceHandler.GetMap(self, params)
-    
+
+    def GetFeatureInfo(self, params):
+        # support for QGIS 1.3.0 GetFeatInfo...
+        if not params.get('i') and not params.get('j'):
+            params['i'] = params.get('x',params.get('X'))
+            params['j'] = params.get('y',params.get('Y'))
+        # support 1.1.1 request that end up using 1.3.0 impl
+        # because the version is not included in GetMap
+        # ArcGIS 9.2 for example makes 1.1.1 GetCaps request
+        # but leaves version out of GetMap
+        if not params.get('crs') and params.get('srs'):
+            params['crs'] = params.get('srs')
+        return WMSBaseServiceHandler.GetFeatureInfo(self, params, 'query_map_point')
+            
     def _buildMap(self, params):
         """ Override _buildMap method to handle reverse axis ordering in WMS 1.3.0.
         
         More info: http://mapserver.org/development/rfc/ms-rfc-30.html
+        http://trac.osgeo.org/mapserver/changeset/10459
         
         'when using epsg code >=4000 and <5000 will be assumed to have a reversed axes.'
         
         """
         # Call superclass method
         m = WMSBaseServiceHandler._buildMap(self, params)
-        # for range of epsg codes reverse axis
+        # for range of epsg codes reverse axis as per 1.3.0 spec
         if params['crs'].code >= 4000 and params['crs'].code < 5000:
-            m.zoom_to_box(Box2d(params['bbox'][1], params['bbox'][0], params['bbox'][3], params['bbox'][2]))
+            bbox = params['bbox']
+            # MapInfo Pro 10 does not "know" this is the way and gets messed up
+            if not 'mapinfo' in params['HTTP_USER_AGENT'].lower():
+                m.zoom_to_box(Envelope(bbox[1], bbox[0], bbox[3], bbox[2]))
         return m    
 
 class ExceptionHandler(BaseExceptionHandler):
@@ -241,3 +265,4 @@ class ExceptionHandler(BaseExceptionHandler):
                 'HTML': BaseExceptionHandler.htmlhandler}
 
     defaulthandler = 'XML'
+
