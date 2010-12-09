@@ -83,7 +83,7 @@ class BaseWMSFactory:
                     meta_lyr.name = meta_layer_name
                     meta_lyr.wmsextrastyles = ()
                     meta_lyr.defaultstyle = meta_layer_name
-                    self.ordered_layers.insert(0,meta_lyr)
+                    self.ordered_layers.append(meta_lyr)
                     self.meta_layers[meta_layer_name] = meta_lyr
                     print meta_layer_name
 
@@ -114,7 +114,7 @@ class BaseWMSFactory:
                         meta_lyr.name = meta_layer_name
                         meta_lyr.wmsextrastyles = ()
                         meta_lyr.defaultstyle = meta_layer_name
-                        self.ordered_layers.insert(0,meta_lyr)
+                        self.ordered_layers.append(meta_lyr)
                         self.meta_layers[meta_layer_name] = meta_lyr
                     
                     if style_name not in self.aggregatestyles.keys() and style_name not in self.styles.keys():
@@ -145,7 +145,7 @@ class BaseWMSFactory:
             layer.wmsextrastyles = extrastyles
         else:
             raise ServerConfigurationError('Layer "%s" was passed an invalid list of extra styles.  List must be a tuple of strings.' % layername)
-        self.ordered_layers.insert(0,layer)    
+        self.ordered_layers.append(layer)    
         self.layers[layername] = layer
 
     def register_style(self, name, style):
