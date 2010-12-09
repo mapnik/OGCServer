@@ -142,7 +142,7 @@ class BaseServiceHandler:
                             element.append(kelement)
                     else:
                         element = ElementTree.Element('%s' % item[1])
-                        element.text = value
+                        element.text = to_unicode(value)
                         servicee.append(element)
             if len(self.conf.items_with_value('contact')) > 0:
                 element = ElementTree.Element('ContactInformation')
