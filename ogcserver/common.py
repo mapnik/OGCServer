@@ -457,7 +457,7 @@ class WMSBaseServiceHandler(BaseServiceHandler):
 
 class BaseExceptionHandler:
 
-    def __init__(self, debug,base,home_html=None):
+    def __init__(self, debug,base=False,home_html=None):
         self.debug = debug
         self.base = base
         self.home_html = home_html
