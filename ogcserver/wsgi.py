@@ -69,12 +69,18 @@ class WSGIApp:
         for key, value in parse_qs(environ['QUERY_STRING'], True).items():
             reqparams[key.lower()] = value[0]
             base = False
-        server_port = environ['SERVER_PORT']
-        if server_port == '80':
-            port = ''
+
+        if self.conf.has_option_with_value('service', 'baseurl'):
+            onlineresource = '%s' % self.conf.get('service', 'baseurl')
         else:
-            port = ':%s' % server_port
-        onlineresource = 'http://%s%s%s%s?' % (environ['SERVER_NAME'],port,environ['SCRIPT_NAME'],environ['PATH_INFO'])
+            # if there is no baseurl in the config file try to guess a valid one
+            server_port = environ['SERVER_PORT']
+            if server_port == '80':
+                port = ''
+            else:
+                port = ':%s' % server_port
+            onlineresource = 'http://%s%s%s%s?' % (environ['SERVER_NAME'], port, environ['SCRIPT_NAME'], environ['PATH_INFO'])
+
         try:
             if not reqparams.has_key('request'):
                 raise OGCException('Missing request parameter.')

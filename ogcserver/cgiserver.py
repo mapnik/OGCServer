@@ -46,12 +46,17 @@ class Handler(cgi.DebugHandler):
             base = True
 
         reqparams = lowerparams(req.params)
-        server_port = req.environ['SERVER_PORT']
-        if server_port == '80':
-            port = ''
+
+        if self.conf.has_option_with_value('service', 'baseurl'): 
+            onlineresource = '%s' % self.conf.get('service', 'baseurl') 
         else:
-            port = ':%s' % server_port
-        onlineresource = 'http://%s%s%s?' % (req.environ['SERVER_NAME'], port, req.environ['SCRIPT_NAME'])
+            # if there is no baseurl in the config file try to guess a valid one
+            server_port = req.environ['SERVER_PORT']
+            if server_port == '80':
+                port = ''
+            else:
+                port = ':%s' % server_port
+            onlineresource = 'http://%s%s%s?' % (req.environ['SERVER_NAME'], port, req.environ['SCRIPT_NAME']) 
 
         try:
             if not reqparams.has_key('request'):
