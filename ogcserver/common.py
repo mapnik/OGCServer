@@ -385,9 +385,7 @@ class WMSBaseServiceHandler(BaseServiceHandler):
         # haiti spec tmp hack! show meta layers without having
         # to request huge string to avoid some client truncating it!
         if params['layers'] and params['layers'][0] in ('osm_haiti_overlay','osm_haiti_overlay_900913'):
-            reordered_layers = copy.copy(self.mapfactory.ordered_layers)
-            reordered_layers.reverse()
-            for layer_obj in reordered_layers:
+            for layer_obj in self.mapfactory.ordered_layers:
                 layer = copy_layer(layer_obj)
                 if not hasattr(layer,'meta_style'):
                     pass
@@ -398,9 +396,7 @@ class WMSBaseServiceHandler(BaseServiceHandler):
         # a non WMS spec way of requesting all layers
         # uses orderedlayers that preserves original ordering in XML mapfile
         elif params['layers'] and params['layers'][0] == '__all__':
-            reordered_layers = copy.copy(self.mapfactory.ordered_layers)
-            reordered_layers.reverse()
-            for layer_obj in reordered_layers:
+            for layer_obj in self.mapfactory.ordered_layers:
                 # if we don't copy the layer here we get
                 # duplicate layers added to the map because the
                 # layer is kept around and the styles "pile up"...
