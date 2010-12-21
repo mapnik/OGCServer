@@ -74,12 +74,7 @@ class WSGIApp:
             onlineresource = '%s' % self.conf.get('service', 'baseurl')
         else:
             # if there is no baseurl in the config file try to guess a valid one
-            server_port = environ['SERVER_PORT']
-            if server_port == '80':
-                port = ''
-            else:
-                port = ':%s' % server_port
-            onlineresource = 'http://%s%s%s%s?' % (environ['SERVER_NAME'], port, environ['SCRIPT_NAME'], environ['PATH_INFO'])
+            onlineresource = 'http://%s%s%s?' % (environ['HTTP_HOST'], environ['SCRIPT_NAME'], environ['PATH_INFO'])
 
         try:
             if not reqparams.has_key('request'):
