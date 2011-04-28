@@ -203,7 +203,7 @@ class ServiceHandler(WMSBaseServiceHandler):
                         style.append(styletitle)
                         layere.append(style)
                 rootlayerelem.append(layere)
-            self.capabilities = '<?xml version="1.0" encoding="UTF-8"?>' + ElementTree.tostring(capetree,pretty_print=True)
+            self.capabilities = '<?xml version="1.0" encoding="UTF-8"?>' + ElementTree.tostring(capetree,encoding='UTF-8',pretty_print=True)
         response = Response('text/xml', self.capabilities)
         return response
 
