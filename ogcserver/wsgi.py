@@ -111,7 +111,7 @@ class WSGIApp:
 
             # stick the user agent in the request params
             # so that we can add ugly hacks for specific buggy clients
-            ogcparams['HTTP_USER_AGENT'] = environ['HTTP_USER_AGENT']
+            ogcparams['HTTP_USER_AGENT'] = environ.get('HTTP_USER_AGENT', '')
 
             response = requesthandler(ogcparams)
         except:
