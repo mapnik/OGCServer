@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map>
+<Map buffer_size="128">
+
+<Style name="row">
+	<Rule>
+		<TextSymbolizer name="tèst" face_name="DejaVu Sans Book"
+			size="10" fill="black" halo_fill="white" halo_radius="1" placement="point"
+			allow_overlap="false" />
+	</Rule>
+</Style>
+
+<Layer name="row" title="row" queryable="true">
+	<StyleName>row</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">shape_iso8859-1_col</Parameter>
+		<Parameter name="encoding">iso-8859-1</Parameter>
+	</Datasource>
+</Layer>
+</Map>

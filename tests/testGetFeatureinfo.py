@@ -8,7 +8,7 @@ def test_encoding():
     from ogcserver.wms130 import ServiceHandler as ServiceHandler130
 
     base_path, tail = os.path.split(__file__)
-    file_path = os.path.join(base_path, 'mapfile_encoding.xml')
+    file_path = os.path.join(base_path, 'shape_encoding.xml')
     wms = BaseWMSFactory() 
     wms.loadXML(file_path)
     wms.finalize()
@@ -16,12 +16,22 @@ def test_encoding():
     conf = SafeConfigParser()
     conf.readfp(open(os.path.join(base_path, 'ogcserver.conf')))
 
+# srs = EPSG:4326
+# 3.00 , 42,35 - 3.15 , 42.51
+# x = 5 , y = 6
+    params = {}
+    params['srs'] = 'epsg:4326'
+    params['x'] = 5
+    params['y'] = 5
+    params['bbox'] = [3.00,42.35,3.15,42.51]
+    params['height'] = 10
+    params['width'] = 10
+    params['layers'] = ['row']
+    params['styles'] = ''
+    params['info_format'] = 'text/plain'
+    params['query_layers'] = ['row']
     wms111 = ServiceHandler111(conf, wms, "localhost")
-    response = wms111.GetCapabilities({})
-    # Check the response is encoded in UTF-8
-    # Search for the title in the response
-    if conf.get('service', 'title') not in response.content:
-        raise Exception('GetCapabilities is not correctly encoded')
+    result = wms111.GetFeatureInfo(params)
     
     wms130 = ServiceHandler130(conf, wms, "localhost")
     wms130.GetCapabilities({})
