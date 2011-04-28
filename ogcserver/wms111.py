@@ -63,7 +63,7 @@ class ServiceHandler(WMSBaseServiceHandler):
     <!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">
     <WMT_MS_Capabilities version="1.1.1" updateSequence="0" xmlns:xlink="http://www.w3.org/1999/xlink">
       <Service>
-        <Name>WMS</Name>
+        <Name>OGC:WMS</Name>
       </Service>
       <Capability>
         <Request>
