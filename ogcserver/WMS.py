@@ -2,6 +2,7 @@
 
 import re
 import sys
+import ConfigParser
 try:
     from mapnik2 import Style, Map, load_map 
 except ImportError:
@@ -43,7 +44,7 @@ def extract_named_rules(s_obj):
         return s
 
 class BaseWMSFactory:
-    def __init__(self):
+    def __init__(self, configpath=None):
         self.layers = {}
         self.ordered_layers = []
         self.styles = {}
@@ -51,8 +52,16 @@ class BaseWMSFactory:
         self.map_attributes = {}
         self.meta_styles = {}
         self.meta_layers = {}
+        self.configpath = configpath
 
     def loadXML(self, xmlfile, strict=False):
+        config = ConfigParser.SafeConfigParser()
+        config.readfp(open(self.configpath))
+
+        map_wms_srs = None
+        if config.has_option('map', 'wms_srs'):
+            map_wms_srs = config.get('map', 'wms_srs')
+
         tmp_map = Map(0,0)
         load_map(tmp_map, xmlfile, strict)
         # parse map level attributes
@@ -60,7 +69,14 @@ class BaseWMSFactory:
             self.map_attributes['bgcolor'] = tmp_map.background
         if tmp_map.buffer_size:
             self.map_attributes['buffer_size'] = tmp_map.buffer_size
-        for lyr in tmp_map.layers:   
+        for lyr in tmp_map.layers:
+            layer_section = 'layer_%s' % lyr.name
+            layer_wms_srs = None
+            if config.has_option(layer_section, 'wms_srs'):
+                layer_wms_srs = config.get(layer_section, 'wms_srs')
+            else:
+                layer_wms_srs = map_wms_srs
+
             style_count = len(lyr.styles)
             if style_count == 0:
                 raise ServerConfigurationError("Cannot register Layer '%s' without a style" % lyr.name)
@@ -83,6 +99,7 @@ class BaseWMSFactory:
                     meta_lyr.name = meta_layer_name
                     meta_lyr.wmsextrastyles = ()
                     meta_lyr.defaultstyle = meta_layer_name
+                    meta_lyr.wms_srs = layer_wms_srs
                     self.ordered_layers.append(meta_lyr)
                     self.meta_layers[meta_layer_name] = meta_lyr
                     print meta_layer_name
@@ -92,6 +109,7 @@ class BaseWMSFactory:
 
                 # must copy layer here otherwise we'll segfault
                 lyr_ = common.copy_layer(lyr)
+                lyr_.wms_srs = layer_wms_srs
                 self.register_layer(lyr_, style_name, extrastyles=(style_name,))
 
             elif style_count > 1:
@@ -130,7 +148,7 @@ class BaseWMSFactory:
         layername = layer.name
         if not layername:
             raise ServerConfigurationError('Attempted to register an unnamed layer.')
-        if not re.match('^\+init=epsg:\d+$', layer.srs) and not re.match('^\+proj=.*$', layer.srs):
+        if not layer.wms_srs and not re.match('^\+init=epsg:\d+$', layer.srs) and not re.match('^\+proj=.*$', layer.srs):
             raise ServerConfigurationError('Attempted to register a layer without an epsg projection defined.')
         if defaultstyle not in self.styles.keys() + self.aggregatestyles.keys():
             raise ServerConfigurationError('Attempted to register a layer with an non-existent default style.')

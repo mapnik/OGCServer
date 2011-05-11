@@ -38,7 +38,7 @@ class WSGIApp:
         if fonts:
             mapnik.register_fonts(fonts)
         if mapfile:
-            wms_factory = BaseWMSFactory()
+            wms_factory = BaseWMSFactory(configpath)
             # TODO - add support for Cascadenik MML
             wms_factory.loadXML(mapfile)
             wms_factory.finalize()
@@ -51,7 +51,7 @@ class WSGIApp:
             except ImportError:
                 raise ServerConfigurationError('The factory module could not be loaded.')
             if hasattr(mapfactorymodule, 'WMSFactory'):
-                self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')()
+                self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')(configpath)
             else:
                 raise ServerConfigurationError('The factory module does not have a WMSFactory class.')
         if conf.has_option('server', 'debug'):
@@ -172,7 +172,7 @@ class MapFilePasteWSGIApp(BasePasteWSGIApp):
         BasePasteWSGIApp.__init__(self, 
                                   configpath, 
                                   font=fonts, home_html=home_html, **kwargs)
-        wms_factory = BaseWMSFactory()
+        wms_factory = BaseWMSFactory(configpath)
         wms_factory.loadXML(mapfile)
         wms_factory.finalize()
         self.mapfactory = wms_factory
@@ -193,7 +193,7 @@ class WMSFactoryPasteWSGIApp(BasePasteWSGIApp):
         except ImportError:
             raise ServerConfigurationError('The factory module could not be loaded.')
         if hasattr(mapfactorymodule, 'WMSFactory'):
-            self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')()
+            self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')(configpath)
         else:
             raise ServerConfigurationError('The factory module does not have a WMSFactory class.')
 

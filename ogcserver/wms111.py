@@ -107,8 +107,6 @@ class ServiceHandler(WMSBaseServiceHandler):
           <Format>text/html</Format>
         </Exception>
         <Layer>
-          <Title>A Mapnik WMS Server</Title>
-          <Abstract>A Mapnik WMS Server</Abstract>
         </Layer>
       </Capability>
     </WMT_MS_Capabilities>
@@ -135,6 +133,27 @@ class ServiceHandler(WMSBaseServiceHandler):
             self.processServiceCapabilities(capetree)
     
             rootlayerelem = capetree.find('Capability/Layer')
+
+            rootlayername = ElementTree.Element('Name')
+            if self.conf.has_option('map', 'wms_name'):
+                rootlayername.text = to_unicode(self.conf.get('map', 'wms_name'))
+            else:
+                rootlayername.text = '__all__'
+            rootlayerelem.append(rootlayername)
+
+            rootlayertitle = ElementTree.Element('Title')
+            if self.conf.has_option('map', 'wms_title'):
+                rootlayertitle.text = to_unicode(self.conf.get('map', 'wms_title'))
+            else:
+                rootlayertitle.text = 'OGCServer WMS Server'
+            rootlayerelem.append(rootlayertitle)
+
+            rootlayerabstract = ElementTree.Element('Abstract')
+            if self.conf.has_option('map', 'wms_abstract'):
+                rootlayerabstract.text = to_unicode(self.conf.get('map', 'wms_abstract'))
+            else:
+                rootlayerabstract.text = 'OGCServer WMS Server'
+            rootlayerelem.append(rootlayerabstract)
     
             for epsgcode in self.allowedepsgcodes:
                 rootlayercrs = ElementTree.Element('SRS')
@@ -154,7 +173,10 @@ class ServiceHandler(WMSBaseServiceHandler):
                 latlonbb.set('maxx', str(urp.x))
                 latlonbb.set('maxy', str(urp.y))
                 layerbbox = ElementTree.Element('BoundingBox')
-                layerbbox.set('SRS', layerproj.epsgstring())
+                if layer.wms_srs:
+                    layerbbox.set('SRS', layer.wms_srs)
+                else:
+                    layerbbox.set('SRS', layerproj.epsgstring())
                 layerbbox.set('minx', str(env.minx))
                 layerbbox.set('miny', str(env.miny))
                 layerbbox.set('maxx', str(env.maxx))
