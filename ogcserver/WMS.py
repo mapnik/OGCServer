@@ -132,6 +132,7 @@ class BaseWMSFactory:
                         meta_lyr.name = meta_layer_name
                         meta_lyr.wmsextrastyles = ()
                         meta_lyr.defaultstyle = meta_layer_name
+                        meta_lyr.wms_srs = layer_wms_srs
                         self.ordered_layers.append(meta_lyr)
                         self.meta_layers[meta_layer_name] = meta_lyr
                     
@@ -142,6 +143,7 @@ class BaseWMSFactory:
                 self.register_aggregate_style(aggregates_name,aggregates)
                 # must copy layer here otherwise we'll segfault
                 lyr_ = common.copy_layer(lyr)
+                lyr_.wms_srs = layer_wms_srs
                 self.register_layer(lyr_, aggregates_name, extrastyles=aggregates)
 
     def register_layer(self, layer, defaultstyle, extrastyles=()):

@@ -295,6 +295,8 @@ def copy_layer(obj):
         lyr.wmsextrastyles = obj.wmsextrastyles
     if hasattr(obj,'meta_style'):
         lyr.meta_style = obj.meta_style
+    if hasattr(lyr, 'wms_srs'):
+        lyr.wms_srs = obj.wms_srs
     return lyr
       
 class WMSBaseServiceHandler(BaseServiceHandler):
