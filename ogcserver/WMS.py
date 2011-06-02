@@ -56,11 +56,12 @@ class BaseWMSFactory:
 
     def loadXML(self, xmlfile, strict=False):
         config = ConfigParser.SafeConfigParser()
-        config.readfp(open(self.configpath))
-
         map_wms_srs = None
-        if config.has_option('map', 'wms_srs'):
-            map_wms_srs = config.get('map', 'wms_srs')
+        if self.configpath:
+            config.readfp(open(self.configpath))
+
+            if config.has_option('map', 'wms_srs'):
+                map_wms_srs = config.get('map', 'wms_srs')
 
         tmp_map = Map(0,0)
         load_map(tmp_map, xmlfile, strict)
