@@ -51,7 +51,7 @@ class WSGIApp:
             except ImportError:
                 raise ServerConfigurationError('The factory module could not be loaded.')
             if hasattr(mapfactorymodule, 'WMSFactory'):
-                self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')(configpath)
+                self.mapfactory = getattr(mapfactorymodule, 'WMSFactory')()
             else:
                 raise ServerConfigurationError('The factory module does not have a WMSFactory class.')
         if conf.has_option('server', 'debug'):
