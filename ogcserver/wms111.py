@@ -1,9 +1,6 @@
 """WMS 1.1.1 compliant GetCapabilities, GetMap, GetFeatureInfo, and Exceptions interface."""
 
-try:
-    from mapnik2 import Coord
-except ImportError:
-    from mapnik import Coord
+from mapnik import Coord
 
 from lxml import etree as ElementTree
 
@@ -184,13 +181,13 @@ class ServiceHandler(WMSBaseServiceHandler):
                 layere = ElementTree.Element('Layer')
                 layere.append(layername)
                 layertitle = ElementTree.Element('Title')
-                if layer.title:
+                if hasattr(layer,'title'):
                     layertitle.text = to_unicode(layer.title)
                 else:
                     layertitle.text = to_unicode(layer.name)
                 layere.append(layertitle)
                 layerabstract = ElementTree.Element('Abstract')
-                if layer.abstract:
+                if hasattr(layer,'abstract'):
                     layerabstract.text = to_unicode(layer.abstract)
                 else:
                     layerabstract.text = 'no abstract'                

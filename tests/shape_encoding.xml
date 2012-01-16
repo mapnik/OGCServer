@@ -1,16 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Map>
-<Map buffer_size="128">
+<Map buffer-size="128" minimum-version="0.7.2">
 
 <Style name="row">
 	<Rule>
-		<TextSymbolizer name="tèst" face_name="DejaVu Sans Book"
-			size="10" fill="black" halo_fill="white" halo_radius="1" placement="point"
-			allow_overlap="false" />
+		<TextSymbolizer size="10" fill="black" placement="point" face-name="DejaVu Sans Book" halo-fill="white" halo-radius="1" allow-overlap="false">[t&#232;st]</TextSymbolizer>
 	</Rule>
 </Style>
 
-<Layer name="row" title="row" queryable="true">
+<Layer name="row" queryable="true">
 	<StyleName>row</StyleName>
 
 	<Datasource>

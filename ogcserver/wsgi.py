@@ -1,15 +1,16 @@
 """WSGI application wrapper for Mapnik OGC WMS Server."""
 
-from cgi import parse_qs
+try:
+    from urlparse import parse_qs
+except ImportError:
+    from cgi import parse_qs
+
 import logging
 import imp
 
 from cStringIO import StringIO
 
-try:
-    import mapnik2 as mapnik
-except ImportError:
-    import mapnik
+import mapnik
 
 from ogcserver.common import Version
 from ogcserver.WMS import BaseWMSFactory

@@ -4,17 +4,19 @@ import re
 import sys
 import copy
 from sys import exc_info
-from PIL.Image import new
-from PIL.ImageDraw import Draw
 from StringIO import StringIO
 from lxml import etree as ElementTree
 from traceback import format_exception, format_exception_only
 
-try:
-    from mapnik2 import Map, Color, Box2d as Envelope, render, Image, Layer, Style, Projection as MapnikProjection, Coord, mapnik_version
-except ImportError:
-    from mapnik import Map, Color, Envelope, render, Image, Layer, Style, Projection as MapnikProjection, Coord, mapnik_version
+from mapnik import Map, Color, Envelope, render, Image, Layer, Style, Projection as MapnikProjection, Coord, mapnik_version
 
+try:
+    from PIL.Image import new
+    from PIL.ImageDraw import Draw
+    HAS_PIL = True
+except ImportError:
+    sys.stderr.write('Warning: PIL.Image not found: image based error messages will not be supported\n')
+    HAS_PIL = False
 
 from ogcserver.exceptions import OGCException, ServerConfigurationError
 
@@ -275,13 +277,15 @@ class CRSFactory:
 
 def copy_layer(obj):
     lyr = Layer(obj.name)
-    lyr.title = obj.title
+    if hasattr(lyr,'title'):
+        lyr.title = obj.title
+    if hasattr(lyr,'abstract'):    
+        lyr.abstract = obj.abstract
     # only if mapnik version supports it
     # http://trac.mapnik.org/ticket/503
     if hasattr(lyr, 'tolerance'):
         lyr.tolerance = obj.tolerance
         lyr.toleranceunits = obj.toleranceunits
-    lyr.abstract = obj.abstract
     lyr.srs = obj.srs
     lyr.minzoom = obj.minzoom
     lyr.maxzoom = obj.maxzoom

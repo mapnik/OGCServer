@@ -3,10 +3,7 @@
 import re
 import sys
 import ConfigParser
-try:
-    from mapnik2 import Style, Map, load_map 
-except ImportError:
-    from mapnik import Style, Map, load_map 
+from mapnik import Style, Map, load_map 
 
 from ogcserver import common
 from ogcserver.wms111 import ServiceHandler as ServiceHandler111
@@ -88,7 +85,7 @@ class BaseWMSFactory:
                 meta_s = extract_named_rules(style_obj)
                 if meta_s:
                     self.meta_styles['%s_meta' % lyr.name] = meta_s
-                    if lyr.abstract:
+                    if hasattr(lyr,'abstract'):
                         name_ = lyr.abstract
                     else:
                         name_ = lyr.name
@@ -120,7 +117,7 @@ class BaseWMSFactory:
                     meta_s = extract_named_rules(style_obj)
                     if meta_s:
                         self.meta_styles['%s_meta' % lyr.name] = meta_s
-                        if lyr.abstract:
+                        if hasattr(lyr,'abstract'):
                             name_ = lyr.abstract
                         else:
                             name_ = lyr.name

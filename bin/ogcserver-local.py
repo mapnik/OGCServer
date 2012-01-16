@@ -8,6 +8,7 @@ from os import path
 if not len(sys.argv) > 1:
     sys.exit('Usage: %s <map.xml>' % os.path.basename(sys.argv[0]))
 
+sys.path.insert(0,os.path.abspath('.'))
 
 from ogcserver.wsgi import WSGIApp
 
