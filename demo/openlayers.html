@@ -1,0 +1,61 @@
+<html>
+<head>
+    <title>WMS Test</title>
+    <style type="text/css">
+    html, body { height: 100%; }
+    body {margin: 0px;}
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+    </style>
+    <!-- set up to run local with these commands:
+            wget http://openlayers.org/download/OpenLayers-2.9.zip
+            unzip OpenLayers-2.9.zip
+    -->
+    <!--<script src="Openlayers-2.9/OpenLayers.js"></script>-->
+    
+    <script src="http://openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript">
+        
+        var map;
+        
+        function init(){
+
+            // Options for World Map in Google Spherical Mercator Projection
+            var options = { 
+                maxResolution: 156543.0339,
+                units: 'm',
+                projection: new OpenLayers.Projection("EPSG:3857"),
+                displayProjection: new OpenLayers.Projection("EPSG:4326"),
+                maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+                };
+
+            map = new OpenLayers.Map('map', options);
+            
+            var servers = ['http://localhost:8000/']
+
+            wms1 = new OpenLayers.Layer.WMS("Test", servers,
+                    {
+                        layers: ['__all__'],
+                        styles:[''],
+                        format:'image/png'
+                    }, 
+                    {
+                        isBaseLayer: true
+                    }
+                );
+            
+            map.addLayers([wms1]);
+            //map.zoomToExtent(new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34));
+            map.zoomToMaxExtent();     
+        }                
+    </script>
+  </head>
+
+  <body onload="init()">
+    <h2 style="position:absolute; z-index:10000; left: 100px;">WMS Test</h2>
+    <div id="map"> </div>
+  </body>
+
+</html>
