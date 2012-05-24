@@ -472,9 +472,9 @@ class BaseExceptionHandler:
                 message = open(self.home_html,'r').read()
             else:
                 message = '''
-                <h2>Welcome to the Mapnik OGCServer.</h2>
+                <h2>Welcome to the OGCServer</h2>
                 <h3>Ready to accept map requests...</h3>
-                <h4><a href="http://bitbucket.org/springmeyer/ogcserver/">More info</a></h4>
+                <h4><a href="https://github.com/mapnik/OGCServer">More info</a></h4>
                 '''
             return self.htmlhandler('', message)
         excinfo = exc_info()
