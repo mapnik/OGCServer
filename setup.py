@@ -61,5 +61,6 @@ if not HAS_SETUPTOOLS:
         missing = True
         warning +' lxml (easy_install lxml)'
     if missing:
+        import sys
         sys.stderr.write('%s\n' % warning)
 
