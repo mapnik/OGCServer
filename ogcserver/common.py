@@ -277,14 +277,19 @@ class CRSFactory:
 
 def copy_layer(obj):
     lyr = Layer(obj.name)
-    if hasattr(lyr,'title'):
+    if hasattr(obj, 'title'):
         lyr.title = obj.title
-    if hasattr(lyr,'abstract'):    
+    else:
+        lyr.title = ''
+    if hasattr(obj, 'abstract'):    
         lyr.abstract = obj.abstract
+    else:
+        lyr.abstract = ''
     # only if mapnik version supports it
     # http://trac.mapnik.org/ticket/503
-    if hasattr(lyr, 'tolerance'):
+    if hasattr(obj, 'tolerance'):
         lyr.tolerance = obj.tolerance
+    if hasattr(obj, 'toleranceunits'):
         lyr.toleranceunits = obj.toleranceunits
     lyr.srs = obj.srs
     lyr.minzoom = obj.minzoom
@@ -327,8 +332,8 @@ class WMSBaseServiceHandler(BaseServiceHandler):
                     for feat in features:
                         writer.addfeature()
                         if mapnik_version() >= 800:
-                            for prop in feat:
-                                writer.addattribute(prop[0], prop[1])                        
+                            for prop,value in feat.attributes.iteritems():
+                                writer.addattribute(prop, value)                        
                         else:
                             for prop in feat.properties:
                                 writer.addattribute(prop[0], prop[1])
@@ -346,8 +351,8 @@ class WMSBaseServiceHandler(BaseServiceHandler):
                             for feat in features:
                                 writer.addfeature()
                                 if mapnik_version() >= 800:
-                                    for prop in feat:
-                                        writer.addattribute(prop[0], prop[1])                        
+                                    for prop,value in feat.attributes.iteritems():
+                                        writer.addattribute(prop, value)                        
                                 else:
                                     for prop in feat.properties:
                                         writer.addattribute(prop[0], prop[1])

@@ -75,6 +75,16 @@ class BaseWMSFactory:
             else:
                 layer_wms_srs = map_wms_srs
 
+            if config.has_option(layer_section, 'title'):
+                lyr.title = config.get(layer_section, 'title')
+            else:
+                lyr.title = ''
+
+            if config.has_option(layer_section, 'abstract'):
+                lyr.abstract = config.get(layer_section, 'abstract')
+            else:
+                lyr.abstract = ''
+
             style_count = len(lyr.styles)
             if style_count == 0:
                 raise ServerConfigurationError("Cannot register Layer '%s' without a style" % lyr.name)
