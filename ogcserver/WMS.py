@@ -3,7 +3,7 @@
 import re
 import sys
 import ConfigParser
-from mapnik import Style, Map, load_map, Envelope
+from mapnik import Style, Map, load_map, Envelope, Coord
 
 from ogcserver import common
 from ogcserver.wms111 import ServiceHandler as ServiceHandler111
@@ -50,7 +50,7 @@ class BaseWMSFactory:
         self.meta_styles = {}
         self.meta_layers = {}
         self.configpath = configpath
-        self.latlonbb = Envelope()
+        self.latlonbb = None
 
     def loadXML(self, xmlfile, strict=False):
         config = ConfigParser.SafeConfigParser()
@@ -175,9 +175,13 @@ class BaseWMSFactory:
         else:
             raise ServerConfigurationError('Layer "%s" was passed an invalid list of extra styles.  List must be a tuple of strings.' % layername)
         layerproj = common.Projection(layer.srs)
+        env = layer.envelope()
         llp = layerproj.inverse(Coord(env.minx, env.miny))
         urp = layerproj.inverse(Coord(env.maxx, env.maxy))
-        self.latlonbb.expand_to_include(Envelope(llp, urp))
+        if self.latlonbb is None:
+            self.latlonbb = Envelope(llp, urp)
+        else:
+            self.latlonbb.expand_to_include(Envelope(llp, urp))
         self.ordered_layers.append(layer)
         self.layers[layername] = layer
 
