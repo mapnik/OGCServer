@@ -129,13 +129,13 @@ class ServiceHandler(WMSBaseServiceHandler):
     def GetCapabilities(self, params):
         if not self.capabilities:
             capetree = ElementTree.fromstring(self.capabilitiesxmltemplate)
-    
+
             elements = capetree.findall('{http://www.opengis.net/wms}Capability//{http://www.opengis.net/wms}OnlineResource')
             for element in elements:
                 element.set('{http://www.w3.org/1999/xlink}href', self.opsonlineresource)
-    
+
             self.processServiceCapabilities(capetree)
-    
+
             rootlayerelem = capetree.find('{http://www.opengis.net/wms}Capability/{http://www.opengis.net/wms}Layer')
 
             rootlayername = ElementTree.Element('Name')
@@ -158,12 +158,26 @@ class ServiceHandler(WMSBaseServiceHandler):
             else:
                 rootlayerabstract.text = 'OGCServer WMS Server'
             rootlayerelem.append(rootlayerabstract)
-    
+
+            layerexgbb = ElementTree.Element('EX_GeographicBoundingBox')
+            exgbb_wbl = ElementTree.Element('westBoundLongitude')
+            exgbb_wbl.text = str(self.mapfactory.latlonbbox.minx)
+            layerexgbb.append(exgbb_wbl)
+            exgbb_ebl = ElementTree.Element('eastBoundLongitude')
+            exgbb_ebl.text = str(self.mapfactory.latlonbbox.maxx)
+            layerexgbb.append(exgbb_ebl)
+            exgbb_sbl = ElementTree.Element('southBoundLatitude')
+            exgbb_sbl.text = str(self.mapfactory.latlonbbox.miny)
+            layerexgbb.append(exgbb_sbl)
+            exgbb_nbl = ElementTree.Element('northBoundLatitude')
+            exgbb_nbl.text = str(self.mapfactory.latlonbbox.maxy)
+            rootlayerelem.append(exgbb_nbl)
+
             for epsgcode in self.allowedepsgcodes:
                 rootlayercrs = ElementTree.Element('CRS')
                 rootlayercrs.text = epsgcode.upper()
                 rootlayerelem.append(rootlayercrs)
-    
+
             for layer in self.mapfactory.ordered_layers:
                 layerproj = Projection(layer.srs)
                 layername = ElementTree.Element('Name')
@@ -199,13 +213,13 @@ class ServiceHandler(WMSBaseServiceHandler):
                 if hasattr(layer,'title'):
                     layertitle.text = to_unicode(layer.title)
                 else:
-                    layertitle.text = to_unicode(layer.name)                    
+                    layertitle.text = to_unicode(layer.name)
                 layere.append(layertitle)
                 layerabstract = ElementTree.Element('Abstract')
                 if hasattr(layer,'abstract'):
                     layerabstract.text = to_unicode(layer.abstract)
                 else:
-                    layerabstract.text = 'no abstract'                
+                    layerabstract.text = 'no abstract'
                 layere.append(layerabstract)
                 if layer.queryable:
                     layere.set('queryable', '1')
@@ -243,15 +257,15 @@ class ServiceHandler(WMSBaseServiceHandler):
         if not params.get('crs') and params.get('srs'):
             params['crs'] = params.get('srs')
         return WMSBaseServiceHandler.GetFeatureInfo(self, params, 'query_map_point')
-            
+
     def _buildMap(self, params):
         """ Override _buildMap method to handle reverse axis ordering in WMS 1.3.0.
-        
+
         More info: http://mapserver.org/development/rfc/ms-rfc-30.html
         http://trac.osgeo.org/mapserver/changeset/10459
-        
+
         'when using epsg code >=4000 and <5000 will be assumed to have a reversed axes.'
-        
+
         """
         # Call superclass method
         m = WMSBaseServiceHandler._buildMap(self, params)
@@ -261,7 +275,7 @@ class ServiceHandler(WMSBaseServiceHandler):
             # MapInfo Pro 10 does not "know" this is the way and gets messed up
             if not 'mapinfo' in params['HTTP_USER_AGENT'].lower():
                 m.zoom_to_box(Envelope(bbox[1], bbox[0], bbox[3], bbox[2]))
-        return m    
+        return m
 
 class ExceptionHandler(BaseExceptionHandler):
 
