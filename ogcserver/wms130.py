@@ -161,17 +161,18 @@ class ServiceHandler(WMSBaseServiceHandler):
 
             layerexgbb = ElementTree.Element('EX_GeographicBoundingBox')
             exgbb_wbl = ElementTree.Element('westBoundLongitude')
-            exgbb_wbl.text = str(self.mapfactory.latlonbbox.minx)
+            exgbb_wbl.text = str(self.mapfactory.latlonbb.minx)
             layerexgbb.append(exgbb_wbl)
             exgbb_ebl = ElementTree.Element('eastBoundLongitude')
-            exgbb_ebl.text = str(self.mapfactory.latlonbbox.maxx)
+            exgbb_ebl.text = str(self.mapfactory.latlonbb.maxx)
             layerexgbb.append(exgbb_ebl)
             exgbb_sbl = ElementTree.Element('southBoundLatitude')
-            exgbb_sbl.text = str(self.mapfactory.latlonbbox.miny)
+            exgbb_sbl.text = str(self.mapfactory.latlonbb.miny)
             layerexgbb.append(exgbb_sbl)
             exgbb_nbl = ElementTree.Element('northBoundLatitude')
-            exgbb_nbl.text = str(self.mapfactory.latlonbbox.maxy)
-            rootlayerelem.append(exgbb_nbl)
+            exgbb_nbl.text = str(self.mapfactory.latlonbb.maxy)
+            layerexgbb.append(exgbb_nbl)
+            rootlayerelem.append(layerexgbb)
 
             for epsgcode in self.allowedepsgcodes:
                 rootlayercrs = ElementTree.Element('CRS')
