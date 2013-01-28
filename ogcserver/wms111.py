@@ -44,7 +44,7 @@ class ServiceHandler(WMSBaseServiceHandler):
             'feature_count': ParameterDefinition(False, int, 1),
             'x': ParameterDefinition(True, int),
             'y': ParameterDefinition(True, int)
-        }        
+        }
     }
 
     CONF_SERVICE = [
@@ -122,13 +122,13 @@ class ServiceHandler(WMSBaseServiceHandler):
     def GetCapabilities(self, params):
         if not self.capabilities:
             capetree = ElementTree.fromstring(self.capabilitiesxmltemplate)
-    
+
             elements = capetree.findall('Capability//OnlineResource')
             for element in elements:
                 element.set('{http://www.w3.org/1999/xlink}href', self.opsonlineresource)
-    
+
             self.processServiceCapabilities(capetree)
-    
+
             rootlayerelem = capetree.find('Capability/Layer')
 
             rootlayername = ElementTree.Element('Name')
@@ -151,12 +151,19 @@ class ServiceHandler(WMSBaseServiceHandler):
             else:
                 rootlayerabstract.text = 'OGCServer WMS Server'
             rootlayerelem.append(rootlayerabstract)
-    
+
+            latlonbb = ElementTree.Element('LatLonBoundingBox')
+            latlonbb.set('minx', str(self.mapfactory.latlonbb.minx))
+            latlonbb.set('miny', str(self.mapfactory.latlonbb.miny))
+            latlonbb.set('maxx', str(self.mapfactory.latlonbb.maxx))
+            latlonbb.set('maxy', str(self.mapfactory.latlonbb.maxy))
+            rootlayerelem.append(latlonbb)
+
             for epsgcode in self.allowedepsgcodes:
                 rootlayercrs = ElementTree.Element('SRS')
                 rootlayercrs.text = epsgcode.upper()
                 rootlayerelem.append(rootlayercrs)
-    
+
             for layer in self.mapfactory.ordered_layers:
                 layerproj = Projection(layer.srs)
                 layername = ElementTree.Element('Name')
@@ -190,10 +197,10 @@ class ServiceHandler(WMSBaseServiceHandler):
                 if hasattr(layer,'abstract'):
                     layerabstract.text = to_unicode(layer.abstract)
                 else:
-                    layerabstract.text = 'no abstract'                
+                    layerabstract.text = 'no abstract'
                 layere.append(layerabstract)
                 if layer.queryable:
-                    layere.set('queryable', '1')                
+                    layere.set('queryable', '1')
                 layere.append(latlonbb)
                 layere.append(layerbbox)
                 if len(layer.wmsextrastyles) > 0:
@@ -219,7 +226,7 @@ class ServiceHandler(WMSBaseServiceHandler):
         params['crs'] = params['srs']
         params['i'] = params['x']
         params['j'] = params['y']
-        return WMSBaseServiceHandler.GetFeatureInfo(self, params, 'query_map_point')        
+        return WMSBaseServiceHandler.GetFeatureInfo(self, params, 'query_map_point')
 
 class ExceptionHandler(BaseExceptionHandler):
 

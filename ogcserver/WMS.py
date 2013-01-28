@@ -3,7 +3,7 @@
 import re
 import sys
 import ConfigParser
-from mapnik import Style, Map, load_map 
+from mapnik import Style, Map, load_map, Envelope, Coord
 
 from ogcserver import common
 from ogcserver.wms111 import ServiceHandler as ServiceHandler111
@@ -36,7 +36,7 @@ def extract_named_rules(s_obj):
                 if rule.name:
                     s.rules.append(rule)
                     if not rule.name in s.names:
-                        s.names.append(rule.name)           
+                        s.names.append(rule.name)
     if len(s.rules):
         return s
 
@@ -50,6 +50,7 @@ class BaseWMSFactory:
         self.meta_styles = {}
         self.meta_layers = {}
         self.configpath = configpath
+        self.latlonbb = None
 
     def loadXML(self, xmlfile, strict=False):
         config = ConfigParser.SafeConfigParser()
@@ -91,7 +92,7 @@ class BaseWMSFactory:
             elif style_count == 1:
                 style_obj = tmp_map.find_style(lyr.styles[0])
                 style_name = lyr.styles[0]
-        
+
                 meta_s = extract_named_rules(style_obj)
                 if meta_s:
                     self.meta_styles['%s_meta' % lyr.name] = meta_s
@@ -123,7 +124,7 @@ class BaseWMSFactory:
             elif style_count > 1:
                 for style_name in lyr.styles:
                     style_obj = tmp_map.find_style(style_name)
-                    
+
                     meta_s = extract_named_rules(style_obj)
                     if meta_s:
                         self.meta_styles['%s_meta' % lyr.name] = meta_s
@@ -143,7 +144,7 @@ class BaseWMSFactory:
                         meta_lyr.wms_srs = layer_wms_srs
                         self.ordered_layers.append(meta_lyr)
                         self.meta_layers[meta_layer_name] = meta_lyr
-                    
+
                     if style_name not in self.aggregatestyles.keys() and style_name not in self.styles.keys():
                         self.register_style(style_name, style_obj)
                 aggregates = tuple([sty for sty in lyr.styles])
@@ -173,7 +174,15 @@ class BaseWMSFactory:
             layer.wmsextrastyles = extrastyles
         else:
             raise ServerConfigurationError('Layer "%s" was passed an invalid list of extra styles.  List must be a tuple of strings.' % layername)
-        self.ordered_layers.append(layer)    
+        layerproj = common.Projection(layer.srs)
+        env = layer.envelope()
+        llp = layerproj.inverse(Coord(env.minx, env.miny))
+        urp = layerproj.inverse(Coord(env.maxx, env.maxy))
+        if self.latlonbb is None:
+            self.latlonbb = Envelope(llp, urp)
+        else:
+            self.latlonbb.expand_to_include(Envelope(llp, urp))
+        self.ordered_layers.append(layer)
         self.layers[layername] = layer
 
     def register_style(self, name, style):
