@@ -563,6 +563,8 @@ class TextFeatureInfo:
                 # https://github.com/mapnik/mapnik/pull/1837
                 # try the default encoding just in case source is a shape
                 name = to_unicode(name.decode('latin1').encode('utf-8'))
+        if not value:
+            value = ''
         value = unicode(value)
         self.buffer += '%s=%s\n' % (name, value)
 
@@ -600,6 +602,8 @@ class XMLFeatureInfo:
                 # https://github.com/mapnik/mapnik/pull/1837
                 # try the default encoding just in case source is a shape
                 name = to_unicode(name.decode('latin1').encode('utf-8'))
+        if not value:
+            value = ''
         attname.text = name
         attvalue = ElementTree.Element('value')
         attvalue.text = unicode(value)
