@@ -556,10 +556,18 @@ class TextFeatureInfo:
         pass#self.buffer += '\n'
 
     def addattribute(self, name, value):
-        self.buffer += '%s=%s\n' % (name, str(value))
+        if type(name) is str:
+            try:
+                name = to_unicode(name)
+            except:
+                # https://github.com/mapnik/mapnik/pull/1837
+                # try the default encoding just in case source is a shape
+                name = to_unicode(name.decode('latin1').encode('utf-8'))
+        value = unicode(value)
+        self.buffer += '%s=%s\n' % (name, value)
 
     def __str__(self):
-        return self.buffer
+        return self.buffer.encode('utf-8')
 
 class XMLFeatureInfo:
 
@@ -585,6 +593,13 @@ class XMLFeatureInfo:
     def addattribute(self, name, value):
         attribute = ElementTree.Element('attribute')
         attname = ElementTree.Element('name')
+        if type(name) is str:
+            try:
+                name = to_unicode(name)
+            except:
+                # https://github.com/mapnik/mapnik/pull/1837
+                # try the default encoding just in case source is a shape
+                name = to_unicode(name.decode('latin1').encode('utf-8'))
         attname.text = name
         attvalue = ElementTree.Element('value')
         attvalue.text = unicode(value)

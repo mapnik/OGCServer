@@ -28,13 +28,16 @@ def test_encoding():
     params['width'] = 10
     params['layers'] = ['row']
     params['styles'] = ''
-    params['info_format'] = 'text/plain'
     params['query_layers'] = ['row']
-    wms111 = ServiceHandler111(conf, wms, "localhost")
-    result = wms111.GetFeatureInfo(params)
-    
-    wms130 = ServiceHandler130(conf, wms, "localhost")
-    wms130.GetCapabilities({})
+
+    for format in ['text/plain', 'text/xml']:
+        params['info_format'] = format
+        wms111 = ServiceHandler111(conf, wms, "localhost")
+        result = wms111.GetFeatureInfo(params)
+        
+        wms130 = ServiceHandler130(conf, wms, "localhost")
+        wms130.GetCapabilities({})
+
 
     return True
  
