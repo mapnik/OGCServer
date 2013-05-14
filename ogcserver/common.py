@@ -608,7 +608,7 @@ class XMLFeatureInfo:
         self.currentfeature.append(attribute)
     
     def __str__(self):
-        return '<?xml version="1.0"?>\n' + ElementTree.tostring(self.rootelement)
+        return '<?xml version="1.0"?>\n' + ElementTree.tostring(self.rootelement, encoding='utf-8')
 
 def to_unicode(obj, encoding='utf-8'):
     if isinstance(obj, basestring):
