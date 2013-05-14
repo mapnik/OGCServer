@@ -510,7 +510,7 @@ class BaseExceptionHandler:
         e.text = message
         if code:
             e.set('code', code)
-        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree,pretty_print=True))
+        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree))
 
     def inimagehandler(self, code, message, params):
         im = new('RGBA', (int(params['width']), int(params['height'])))
