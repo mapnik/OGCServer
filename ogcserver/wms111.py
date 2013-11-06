@@ -170,8 +170,9 @@ class ServiceHandler(WMSBaseServiceHandler):
                 rootbbox = ElementTree.Element('BoundingBox')
                 rootbbox.set('SRS', epsgcode.upper())
                 proj = Projection('+init='+epsgcode)
-                minCoord = Coord(self.mapfactory.latlonbb.minx, self.mapfactory.latlonbb.miny).forward(proj)
-                maxCoord = Coord(self.mapfactory.latlonbb.maxx, self.mapfactory.latlonbb.maxy).forward(proj)
+                bb = self.mapfactory.latlonbb
+                minCoord = Coord(bb.minx, bb.miny).forward(proj)
+                maxCoord = Coord(bb.maxx, bb.maxy).forward(proj)
                 rootbbox.set('minx', str(minCoord.x))
                 rootbbox.set('miny', str(minCoord.y))
                 rootbbox.set('maxx', str(maxCoord.x))
