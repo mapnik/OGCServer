@@ -166,6 +166,16 @@ class ServiceHandler(WMSBaseServiceHandler):
                 rootlayercrs.text = epsgcode.upper()
                 rootlayerelem.append(rootlayercrs)
 
+            for epsgcode in self.allowedepsgcodes:
+                rootbbox = ElementTree.Element('BoundingBox')
+                rootbbox.set('SRS', epsgcode)
+                proj = Projection(epsgcode)
+                rootbbox.set('minx', str(proj.forward(self.mapfactory.latlonbb.minx)))
+                rootbbox.set('miny', str(proj.forward(self.mapfactory.latlonbb.miny)))
+                rootbbox.set('maxx', str(proj.forward(self.mapfactory.latlonbb.maxx)))
+                rootbbox.set('maxy', str(proj.forward(self.mapfactory.latlonbb.maxy)))
+                rootlayerelem.append(rootbbox)
+
             for layer in self.mapfactory.ordered_layers:
                 layerproj = Projection(layer.srs)
                 layername = ElementTree.Element('Name')
