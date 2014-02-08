@@ -13,6 +13,10 @@ parser.add_argument('mapfile', type=str, help='''
 A XML mapnik stylesheet
 ''')
 
+parser.add_argument('-c', '--config', dest='configfile', help='''
+Path to the config file.
+''')
+
 args = parser.parse_args()
 
 sys.path.insert(0,os.path.abspath('.'))
@@ -20,8 +24,11 @@ sys.path.insert(0,os.path.abspath('.'))
 from ogcserver.wsgi import WSGIApp
 import ogcserver
 
-default_conf = resource_filename(ogcserver.__name__, 'default.conf')
-application = WSGIApp(default_conf,args.mapfile)
+configfile = args.configfile
+if not configfile:
+    configfile = resource_filename(ogcserver.__name__, 'default.conf')
+
+application = WSGIApp(configfile,args.mapfile)
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
