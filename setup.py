@@ -20,6 +20,9 @@ options = dict(name='ogcserver',
     url='https://github.com/mapnik/OGCServer',
     packages=['ogcserver'],
     scripts=['bin/ogcserver-local.py'],
+    package_data={
+        'ogcserver':['default.conf'],
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

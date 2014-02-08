@@ -4,6 +4,7 @@ import os
 import sys
 import socket
 from os import path
+from pkg_resources import *
 
 if not len(sys.argv) > 1:
     sys.exit('Usage: %s <map.xml>' % os.path.basename(sys.argv[0]))
@@ -11,8 +12,10 @@ if not len(sys.argv) > 1:
 sys.path.insert(0,os.path.abspath('.'))
 
 from ogcserver.wsgi import WSGIApp
+import ogcserver
 
-application = WSGIApp('conf/ogcserver.conf',mapfile=sys.argv[1])
+default_conf = resource_filename(ogcserver.__name__, 'default.conf')
+application = WSGIApp(default_conf,mapfile=sys.argv[1])
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
