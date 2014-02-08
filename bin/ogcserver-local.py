@@ -5,9 +5,15 @@ import sys
 import socket
 from os import path
 from pkg_resources import *
+import argparse
 
-if not len(sys.argv) > 1:
-    sys.exit('Usage: %s <map.xml>' % os.path.basename(sys.argv[0]))
+parser = argparse.ArgumentParser(description='Runs the ogcserver as WMS server')
+
+parser.add_argument('mapfile', type=str, help='''
+A XML mapnik stylesheet
+''')
+
+args = parser.parse_args()
 
 sys.path.insert(0,os.path.abspath('.'))
 
@@ -15,7 +21,7 @@ from ogcserver.wsgi import WSGIApp
 import ogcserver
 
 default_conf = resource_filename(ogcserver.__name__, 'default.conf')
-application = WSGIApp(default_conf,mapfile=sys.argv[1])
+application = WSGIApp(default_conf,args.mapfile)
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
