@@ -27,7 +27,7 @@ Run the following command inside this directory (the directory that also contain
 
 Run the local http server with the sample data:
 
-    ogcserver-local.py demo/map.xml
+    ogcserver demo/map.xml
 
 Viewing http://localhost:8000/ in a local browser should show a welcome message like 'Welcome to the OGCServer'
 
