@@ -19,6 +19,10 @@ options = dict(name='ogcserver',
     keywords='mapnik,wms,gis,geospatial',
     url='https://github.com/mapnik/OGCServer',
     packages=['ogcserver'],
+    scripts=['bin/ogcserver'],
+    package_data={
+        'ogcserver':['default.conf'],
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
