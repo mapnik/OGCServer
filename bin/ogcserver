@@ -16,6 +16,12 @@ A XML mapnik stylesheet
 parser.add_argument('-c', '--config', dest='configfile', help='''
 Path to the config file.
 ''')
+parser.add_argument('-b', '--bind', dest='bind_address', help='''
+Bind to address.
+''')
+parser.add_argument('-p', '--port', dest='bind_port', type=int, help='''
+Listen on port.
+''')
 
 args = parser.parse_args()
 
@@ -36,8 +42,8 @@ if __name__ == '__main__':
     #   host = socket.getfqdn() # yourname.local
     #else:
     #   host = '0.0.0.0'
-    host = '0.0.0.0'
-    port = 8000
+    host = args.bind_address or '0.0.0.0'
+    port = args.bind_port or 8000
     httpd = make_server(host, port, application)
     print "Listening at %s:%s...." % (host,port)
     httpd.serve_forever()
