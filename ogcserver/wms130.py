@@ -2,7 +2,7 @@
 
 from mapnik import Coord
 
-from lxml import etree as ElementTree
+from xml.etree import ElementTree
 
 from ogcserver.common import ParameterDefinition, Response, Version, ListFactory, \
                    ColorFactory, CRSFactory, CRS, WMSBaseServiceHandler, \
@@ -138,68 +138,68 @@ class ServiceHandler(WMSBaseServiceHandler):
 
             rootlayerelem = capetree.find('{http://www.opengis.net/wms}Capability/{http://www.opengis.net/wms}Layer')
 
-            rootlayername = ElementTree.Element('Name')
+            rootlayername = ElementTree.Element('{http://www.opengis.net/wms}Name')
             if self.conf.has_option('map', 'wms_name'):
                 rootlayername.text = to_unicode(self.conf.get('map', 'wms_name'))
             else:
                 rootlayername.text = '__all__'
             rootlayerelem.append(rootlayername)
 
-            rootlayertitle = ElementTree.Element('Title')
+            rootlayertitle = ElementTree.Element('{http://www.opengis.net/wms}Title')
             if self.conf.has_option('map', 'wms_title'):
                 rootlayertitle.text = to_unicode(self.conf.get('map', 'wms_title'))
             else:
                 rootlayertitle.text = 'OGCServer WMS Server'
             rootlayerelem.append(rootlayertitle)
 
-            rootlayerabstract = ElementTree.Element('Abstract')
+            rootlayerabstract = ElementTree.Element('{http://www.opengis.net/wms}Abstract')
             if self.conf.has_option('map', 'wms_abstract'):
                 rootlayerabstract.text = to_unicode(self.conf.get('map', 'wms_abstract'))
             else:
                 rootlayerabstract.text = 'OGCServer WMS Server'
             rootlayerelem.append(rootlayerabstract)
 
-            layerexgbb = ElementTree.Element('EX_GeographicBoundingBox')
-            exgbb_wbl = ElementTree.Element('westBoundLongitude')
+            layerexgbb = ElementTree.Element('{http://www.opengis.net/wms}EX_GeographicBoundingBox')
+            exgbb_wbl = ElementTree.Element('{http://www.opengis.net/wms}westBoundLongitude')
             exgbb_wbl.text = str(self.mapfactory.latlonbb.minx)
             layerexgbb.append(exgbb_wbl)
-            exgbb_ebl = ElementTree.Element('eastBoundLongitude')
+            exgbb_ebl = ElementTree.Element('{http://www.opengis.net/wms}eastBoundLongitude')
             exgbb_ebl.text = str(self.mapfactory.latlonbb.maxx)
             layerexgbb.append(exgbb_ebl)
-            exgbb_sbl = ElementTree.Element('southBoundLatitude')
+            exgbb_sbl = ElementTree.Element('{http://www.opengis.net/wms}southBoundLatitude')
             exgbb_sbl.text = str(self.mapfactory.latlonbb.miny)
             layerexgbb.append(exgbb_sbl)
-            exgbb_nbl = ElementTree.Element('northBoundLatitude')
+            exgbb_nbl = ElementTree.Element('{http://www.opengis.net/wms}northBoundLatitude')
             exgbb_nbl.text = str(self.mapfactory.latlonbb.maxy)
             layerexgbb.append(exgbb_nbl)
             rootlayerelem.append(layerexgbb)
 
             for epsgcode in self.allowedepsgcodes:
-                rootlayercrs = ElementTree.Element('CRS')
+                rootlayercrs = ElementTree.Element('{http://www.opengis.net/wms}CRS')
                 rootlayercrs.text = epsgcode.upper()
                 rootlayerelem.append(rootlayercrs)
 
             for layer in self.mapfactory.ordered_layers:
                 layerproj = Projection(layer.srs)
-                layername = ElementTree.Element('Name')
+                layername = ElementTree.Element('{http://www.opengis.net/wms}Name')
                 layername.text = to_unicode(layer.name)
                 env = layer.envelope()
-                layerexgbb = ElementTree.Element('EX_GeographicBoundingBox')
+                layerexgbb = ElementTree.Element('{http://www.opengis.net/wms}EX_GeographicBoundingBox')
                 ll = layerproj.inverse(Coord(env.minx, env.miny))
                 ur = layerproj.inverse(Coord(env.maxx, env.maxy))
-                exgbb_wbl = ElementTree.Element('westBoundLongitude')
+                exgbb_wbl = ElementTree.Element('{http://www.opengis.net/wms}westBoundLongitude')
                 exgbb_wbl.text = str(ll.x)
                 layerexgbb.append(exgbb_wbl)
-                exgbb_ebl = ElementTree.Element('eastBoundLongitude')
+                exgbb_ebl = ElementTree.Element('{http://www.opengis.net/wms}eastBoundLongitude')
                 exgbb_ebl.text = str(ur.x)
                 layerexgbb.append(exgbb_ebl)
-                exgbb_sbl = ElementTree.Element('southBoundLatitude')
+                exgbb_sbl = ElementTree.Element('{http://www.opengis.net/wms}southBoundLatitude')
                 exgbb_sbl.text = str(ll.y)
                 layerexgbb.append(exgbb_sbl)
-                exgbb_nbl = ElementTree.Element('northBoundLatitude')
+                exgbb_nbl = ElementTree.Element('{http://www.opengis.net/wms}northBoundLatitude')
                 exgbb_nbl.text = str(ur.y)
                 layerexgbb.append(exgbb_nbl)
-                layerbbox = ElementTree.Element('BoundingBox')
+                layerbbox = ElementTree.Element('{http://www.opengis.net/wms}BoundingBox')
                 if layer.wms_srs:
                     layerbbox.set('CRS', layer.wms_srs)
                 else:
@@ -208,15 +208,15 @@ class ServiceHandler(WMSBaseServiceHandler):
                 layerbbox.set('miny', str(env.miny))
                 layerbbox.set('maxx', str(env.maxx))
                 layerbbox.set('maxy', str(env.maxy))
-                layere = ElementTree.Element('Layer')
+                layere = ElementTree.Element('{http://www.opengis.net/wms}Layer')
                 layere.append(layername)
-                layertitle = ElementTree.Element('Title')
+                layertitle = ElementTree.Element('{http://www.opengis.net/wms}Title')
                 if hasattr(layer,'title'):
                     layertitle.text = to_unicode(layer.title)
                 else:
                     layertitle.text = to_unicode(layer.name)
                 layere.append(layertitle)
-                layerabstract = ElementTree.Element('Abstract')
+                layerabstract = ElementTree.Element('{http://www.opengis.net/wms}Abstract')
                 if hasattr(layer,'abstract'):
                     layerabstract.text = to_unicode(layer.abstract)
                 else:
@@ -228,16 +228,16 @@ class ServiceHandler(WMSBaseServiceHandler):
                 layere.append(layerbbox)
                 if len(layer.wmsextrastyles) > 0:
                     for extrastyle in [layer.wmsdefaultstyle] + list(layer.wmsextrastyles):
-                        style = ElementTree.Element('Style')
-                        stylename = ElementTree.Element('Name')
+                        style = ElementTree.Element('{http://www.opengis.net/wms}Style')
+                        stylename = ElementTree.Element('{http://www.opengis.net/wms}Name')
                         stylename.text = to_unicode(extrastyle)
-                        styletitle = ElementTree.Element('Title')
+                        styletitle = ElementTree.Element('{http://www.opengis.net/wms}Title')
                         styletitle.text = to_unicode(extrastyle)
                         style.append(stylename)
                         style.append(styletitle)
                         layere.append(style)
                 rootlayerelem.append(layere)
-            self.capabilities = '<?xml version="1.0" encoding="UTF-8"?>' + ElementTree.tostring(capetree,encoding='UTF-8',pretty_print=True)
+            self.capabilities = ElementTree.tostring(capetree,encoding='UTF-8')
         response = Response('text/xml', self.capabilities)
         return response
 

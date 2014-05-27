@@ -7,7 +7,6 @@ Python WMS implementation using Mapnik.
 
     Mapnik >= 0.7.0 (and python bindings)
     PIL
-    lxml (build --without-threads)
     PasteScript
     WebOb
 

@@ -5,7 +5,7 @@ import sys
 import copy
 from sys import exc_info
 from StringIO import StringIO
-from lxml import etree as ElementTree
+from xml.etree import ElementTree
 from traceback import format_exception, format_exception_only
 
 from mapnik import Map, Color, Envelope, render, Image, Layer, Style, Projection as MapnikProjection, Coord, mapnik_version

@@ -46,7 +46,6 @@ Dependencies
 Please properly install the following before proceeding further:
 
 - Mapnik python bindings (which will also install the `ogcserver` module code)
-- lxml (http://codespeak.net/lxml/)
 - PIL (http://www.pythonware.com/products/pil)
 
 For the CGI/FastCGI interface also install:
@@ -210,7 +209,7 @@ You have already in this package some factories availables:
 To Do
 -----
 
-- Investigate moving to cElementTree from lxml.
+- Investigate moving to xml.etree.cElementTree from xml.etree.
 - Add some internal "caching" for performance improvements.
 - Switch to using C/C++ libs for image generation, instead of PIL (also
   requires core changes). PIL requirement will remain for INIMAGE/BLANK

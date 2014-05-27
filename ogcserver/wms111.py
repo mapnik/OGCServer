@@ -2,7 +2,7 @@
 
 from mapnik import Coord
 
-from lxml import etree as ElementTree
+from xml.etree import ElementTree
 
 from ogcserver.common import ParameterDefinition, Response, Version, ListFactory, \
                    ColorFactory, CRSFactory, WMSBaseServiceHandler, CRS, \
@@ -56,7 +56,7 @@ class ServiceHandler(WMSBaseServiceHandler):
         ['keywordlist', 'KeywordList', str]
     ]
 
-    capabilitiesxmltemplate = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    capabilitiesxmltemplate = """
     <!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">
     <WMT_MS_Capabilities version="1.1.1" updateSequence="0" xmlns:xlink="http://www.w3.org/1999/xlink">
       <Service>
@@ -214,7 +214,7 @@ class ServiceHandler(WMSBaseServiceHandler):
                         style.append(styletitle)
                         layere.append(style)
                 rootlayerelem.append(layere)
-            self.capabilities = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + ElementTree.tostring(capetree,encoding='UTF-8',pretty_print=True)
+            self.capabilities = ElementTree.tostring(capetree,encoding='UTF-8')
         response = Response('application/vnd.ogc.wms_xml', self.capabilities)
         return response
 

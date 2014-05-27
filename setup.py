@@ -8,7 +8,7 @@ except ImportError:
     HAS_SETUPTOOLS = False
 
 options = dict(name='ogcserver',
-    version='0.1.0',
+    version='0.1.1',
     description="A OGC WMS for Mapnik",
     #long_description="TODO",
     author='Jean-Francois Doyon',
@@ -42,7 +42,7 @@ if HAS_SETUPTOOLS:
                               'wms_factory=ogcserver.wsgi:ogcserver_wms_factory',
                              ],
     },
-    install_requires = ['setuptools', 'PasteScript', 'WebOb', 'lxml', 'PIL']
+    install_requires = ['setuptools', 'PasteScript', 'WebOb', 'PIL']
     ))
 
 setup(**options)
@@ -59,11 +59,6 @@ if not HAS_SETUPTOOLS:
         except:
             missing = True
             warning +=' PIL (easy_install PIL)'
-    try:
-        import lxml
-    except:
-        missing = True
-        warning +' lxml (easy_install lxml)'
     if missing:
         import sys
         sys.stderr.write('%s\n' % warning)

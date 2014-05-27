@@ -30,7 +30,6 @@ Or can be run as a local process using a [http://docs.python.org/library/wsgiref
  * Python
  * Mapnik installed with Python Bindings
  * Proj4 epsg file with all needed customs projections added (ie. google mercator)
- * [http://codespeak.net/lxml/index.html lxml] (Optional as of 0.6.1 -if not present will fall back on built-in xml lib)
  * [http://www.pythonware.com/products/pil/ PIL (Python Imaging Library)]
  * For running as CGI or FastCGI:
    * [http://jonpy.sourceforge.net/ jonpy]

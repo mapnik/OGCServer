@@ -34,7 +34,7 @@ def test_encoding():
     return True
  
 def test_latlonbbox():
-    from lxml import etree as ElementTree
+    from xml.etree import ElementTree
 
     def find_in_root_layer(xml_string, layer_path, tag):
         caps_dom = ElementTree.XML(xml_string)
@@ -42,7 +42,7 @@ def test_latlonbbox():
         if root_lyr is None:
             raise Exception('Hm, couldn\'t find a layer')
         if root_lyr.find(tag) is None:
-            print ElementTree.tostring(root_lyr, pretty_print=True)
+            print ElementTree.tostring(root_lyr)
             raise Exception('Root layer is missing %s' % tag)
 
     conf, caps = _wms_capabilities()
