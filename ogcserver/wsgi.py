@@ -19,6 +19,12 @@ from ogcserver.wms111 import ExceptionHandler as ExceptionHandler111
 from ogcserver.wms130 import ExceptionHandler as ExceptionHandler130
 from ogcserver.exceptions import OGCException, ServerConfigurationError
 
+WSGI_STATUS = {
+    200: '200 OK',
+    404: '404 NOT FOUND',
+    500: '500 SERVER ERROR',
+}
+
 def do_import(module):
     """
     Makes setuptools namespaces work
@@ -129,7 +135,8 @@ class WSGIApp:
         response_headers = [('Content-Type', response.content_type),('Content-Length', str(len(response.content)))]
         if self.max_age:
             response_headers.append(('Cache-Control', self.max_age))
-        start_response('200 OK', response_headers)
+        status = WSGI_STATUS.get(response.status_code, '500 SERVER ERROR')
+        start_response(status, response_headers)
         yield response.content
 
 

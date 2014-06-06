@@ -177,11 +177,14 @@ class BaseServiceHandler:
                         celement.text = value
                         subelement.append(celement)
 
+
 class Response:
 
-    def __init__(self, content_type, content):
+    def __init__(self, content_type, content, status_code=200):
         self.content_type = content_type
         self.content = content
+        self.status_code = status_code
+
 
 class Version:
 
@@ -502,7 +505,7 @@ class BaseExceptionHandler:
            resp_text = '<h2>OGCServer Error:</h2><pre>%s</pre>\n<h3>Traceback:</h3><pre>%s</pre>\n' %  (message, code)
         else:
            resp_text = message
-        return Response('text/html', resp_text)
+        return Response('text/html', resp_text, status_code=404)
 
     def xmlhandler(self, code, message, params):
         ogcexcetree = copy.deepcopy(self.xmltemplate)
@@ -510,7 +513,7 @@ class BaseExceptionHandler:
         e.text = message
         if code:
             e.set('code', code)
-        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree))
+        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree), status_code=404)
 
     def inimagehandler(self, code, message, params):
         im = new('RGBA', (int(params['width']), int(params['height'])))
@@ -522,7 +525,7 @@ class BaseExceptionHandler:
         format = PIL_TYPE_MAPPING[params['format']].replace('256','')
         im.save(fh, format)
         fh.seek(0)
-        return Response(params['format'].replace('8',''), fh.read())
+        return Response(params['format'].replace('8',''), fh.read(), status_code=404)
 
     def blankhandler(self, code, message, params):
         bgcolor = params.get('bgcolor', '#FFFFFF')
@@ -537,7 +540,7 @@ class BaseExceptionHandler:
         format = PIL_TYPE_MAPPING[params['format']].replace('256','')
         im.save(fh, format)
         fh.seek(0)
-        return Response(params['format'].replace('8',''), fh.read())
+        return Response(params['format'].replace('8',''), fh.read(), status_code=404)
 
 class Projection(MapnikProjection):
     
