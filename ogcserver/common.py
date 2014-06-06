@@ -318,6 +318,10 @@ class WMSBaseServiceHandler(BaseServiceHandler):
         im = Image(params['width'], params['height'])
         render(m, im)
         format = PIL_TYPE_MAPPING[params['format']]
+        if mapnik_version() >= 200300:
+            # Mapnik 2.3 uses png8 as default, use png32 for backwards compatibility
+            if format == 'png':
+                format = 'png32'
         return Response(params['format'].replace('8',''), im.tostring(format))
 
     def GetFeatureInfo(self, params, querymethodname='query_point'):
