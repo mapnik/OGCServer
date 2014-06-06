@@ -3,6 +3,8 @@
 from mapnik import Coord
 
 from xml.etree import ElementTree
+ElementTree.register_namespace('', "http://www.opengis.net/wms")
+ElementTree.register_namespace('xlink', "http://www.w3.org/1999/xlink")
 
 from ogcserver.common import ParameterDefinition, Response, Version, ListFactory, \
                    ColorFactory, CRSFactory, CRS, WMSBaseServiceHandler, \
@@ -132,7 +134,7 @@ class ServiceHandler(WMSBaseServiceHandler):
 
             elements = capetree.findall('{http://www.opengis.net/wms}Capability//{http://www.opengis.net/wms}OnlineResource')
             for element in elements:
-                element.set('{http://www.w3.org/1999/xlink}href', self.opsonlineresource)
+                element.set('xlink:href', self.opsonlineresource)
 
             self.processServiceCapabilities(capetree)
 
