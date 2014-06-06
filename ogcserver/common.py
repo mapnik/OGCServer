@@ -384,13 +384,31 @@ class WMSBaseServiceHandler(BaseServiceHandler):
         #    raise OGCException('STYLES length does not match LAYERS length.')
         m = Map(params['width'], params['height'], '+init=%s' % params['crs'])
 
-        if params.has_key('transparent') and params['transparent'] in ('FALSE','False','false'):
-            if params['bgcolor']:
-                m.background = params['bgcolor']
-        elif not params.has_key('transparent') and self.mapfactory.map_attributes.get('bgcolor'):
-            m.background = self.mapfactory.map_attributes['bgcolor']
+        transparent = params.get('transparent', '').lower() == 'true'
+
+        # disable transparent on incompatible formats 
+        if transparent and params.get('format', '') == 'image/jpeg':
+            transparent = False
+
+        if transparent:
+            # transparent has highest priority
+            pass
+        elif params.has_key('bgcolor'):
+            # if not transparent use bgcolor in url            
+            m.background = params['bgcolor']
         else:
-            m.background = Color(0, 0, 0, 0)
+            # if not bgcolor in url use map background
+            if mapnik_version() >= 200000:
+                bgcolor = self.mapfactory.map_attributes.get('bgcolor', None)
+            else:
+                bgcolor = self.mapfactory.map_attributes.get('background-color', None)
+
+            if bgcolor:
+                m.background = bgcolor
+            else:
+                # if not map background defined use white color
+                m.background = Color(255, 255, 255, 0)
+
 
         if params.has_key('buffer_size'):
             if params['buffer_size']:
