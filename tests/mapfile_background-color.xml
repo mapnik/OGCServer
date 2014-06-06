@@ -1,0 +1,17 @@
+<!DOCTYPE Map>
+<Map srs="+init=epsg:4326" buffer-size="128" minimum-version="0.7.2" background-color="rgb(255,0,0)">
+
+<Style name="test">
+<Rule>
+	<PolygonSymbolizer fill-opacity="0.5" fill="#bee8ff"/></Rule>
+</Style>
+
+<Layer name="test">
+	<StyleName>test</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+</Map>

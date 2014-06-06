@@ -27,7 +27,7 @@ class ServiceHandler(WMSBaseServiceHandler):
             'height': ParameterDefinition(True, int),
             'format': ParameterDefinition(True, str, allowedvalues=('image/png','image/png8', 'image/jpeg')),
             'transparent': ParameterDefinition(False, str, 'FALSE', ('TRUE', 'FALSE','true','True','false','False')),
-            'bgcolor': ParameterDefinition(False, ColorFactory, ColorFactory('0xFFFFFF')),
+            'bgcolor': ParameterDefinition(False, ColorFactory, None),
             'exceptions': ParameterDefinition(False, str, 'XML', ('XML', 'INIMAGE', 'BLANK','HTML'),True),
         },
         'GetFeatureInfo': {
