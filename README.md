@@ -6,7 +6,7 @@ Python WMS implementation using Mapnik.
 ## Depends
 
     Mapnik >= 0.7.0 (and python bindings)
-    PIL
+    Pillow
     PasteScript
     WebOb
 
