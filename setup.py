@@ -42,7 +42,7 @@ if HAS_SETUPTOOLS:
                               'wms_factory=ogcserver.wsgi:ogcserver_wms_factory',
                              ],
     },
-    install_requires = ['setuptools', 'PasteScript', 'WebOb', 'PIL']
+    install_requires = ['setuptools', 'PasteScript', 'WebOb', 'Pillow']
     ))
 
 setup(**options)
@@ -55,10 +55,10 @@ if not HAS_SETUPTOOLS:
         # todo import Image ?
     except:
         try:
-            import Image
+            from PIL import Image
         except:
             missing = True
-            warning +=' PIL (easy_install PIL)'
+            warning +=' Pillow (easy_install Pillow)'
     if missing:
         import sys
         sys.stderr.write('%s\n' % warning)
