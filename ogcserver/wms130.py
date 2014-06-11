@@ -215,6 +215,8 @@ class ServiceHandler(WMSBaseServiceHandler):
                 layertitle = ElementTree.Element('{http://www.opengis.net/wms}Title')
                 if hasattr(layer,'title'):
                     layertitle.text = to_unicode(layer.title)
+                    if layertitle.text == '':
+                        layertitle.text = to_unicode(layer.name)
                 else:
                     layertitle.text = to_unicode(layer.name)
                 layere.append(layertitle)
