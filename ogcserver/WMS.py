@@ -3,7 +3,8 @@
 import re
 import sys
 import ConfigParser
-from mapnik import Style, Map, load_map, Envelope, Coord
+from os.path import isfile
+from mapnik import Style, Map, load_map, load_map_from_string, Envelope, Coord
 
 from ogcserver import common
 from ogcserver.wms111 import ServiceHandler as ServiceHandler111
@@ -62,7 +63,10 @@ class BaseWMSFactory:
                 map_wms_srs = config.get('map', 'wms_srs')
 
         tmp_map = Map(0,0)
-        load_map(tmp_map, xmlfile, strict)
+        if isfile(xmlfile):
+            load_map(tmp_map, xmlfile, strict)
+        else:
+            load_map_from_string(tmp_map, xmlfile, strict)
         # parse map level attributes
         if tmp_map.background:
             self.map_attributes['bgcolor'] = tmp_map.background
