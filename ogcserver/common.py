@@ -407,7 +407,7 @@ class WMSBaseServiceHandler(BaseServiceHandler):
                 m.background = bgcolor
             else:
                 # if not map background defined use white color
-                m.background = Color(255, 255, 255, 0)
+                m.background = Color(255, 255, 255, 255)
 
 
         if params.has_key('buffer_size'):

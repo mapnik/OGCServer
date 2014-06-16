@@ -47,11 +47,11 @@ def test_no_background_color():
 
     m = services['1.1.1']._buildMap(ogcparams)
     print 'wms 1.1.1 backgound color: %s' % m.background
-    assert m.background == ColorFactory('rgb(255,255,255,0)')
+    assert m.background == ColorFactory('rgb(255,255,255)')
 
     m = services['1.3.0']._buildMap(ogcparams)
     print 'wms 1.3.0 backgound color: %s' % m.background
-    assert m.background == ColorFactory('rgb(255,255,255,0)')
+    assert m.background == ColorFactory('rgb(255,255,255)')
 
 def test_map_background_color():
     conf, services = _wms_services('mapfile_background-color.xml')
