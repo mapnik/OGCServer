@@ -1,9 +1,6 @@
 import nose
 import os
-from ogcserver.configparser import SafeConfigParser
 from ogcserver.WMS import BaseWMSFactory
-from ogcserver.wms111 import ServiceHandler as ServiceHandler111
-from ogcserver.wms130 import ServiceHandler as ServiceHandler130
 
 def test_wms_capabilities():
     base_path, tail = os.path.split(__file__)

@@ -64,8 +64,11 @@ class BaseWMSFactory:
         tmp_map = Map(0,0)
         if xmlfile:
             load_map(tmp_map, xmlfile, strict)
-        else:
+        elif xmlstring:
             load_map_from_string(tmp_map, xmlstring, strict, basepath)
+        else:
+            raise ServerConfigurationError("Mapnik configuration XML is not specified - 'xmlfile' and 'xmlstring' variables are empty.\
+Please set one of this variables to load mapnik map object.")
         # parse map level attributes
         if tmp_map.background:
             self.map_attributes['bgcolor'] = tmp_map.background
