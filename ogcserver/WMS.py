@@ -3,7 +3,7 @@
 import re
 import sys
 import ConfigParser
-from mapnik import Style, Map, load_map, Envelope, Coord
+from mapnik import Style, Map, load_map, load_map_from_string, Envelope, Coord
 
 from ogcserver import common
 from ogcserver.wms111 import ServiceHandler as ServiceHandler111
@@ -52,7 +52,7 @@ class BaseWMSFactory:
         self.configpath = configpath
         self.latlonbb = None
 
-    def loadXML(self, xmlfile, strict=False):
+    def loadXML(self, xmlfile=None, strict=False, xmlstring='', basepath=''):
         config = ConfigParser.SafeConfigParser()
         map_wms_srs = None
         if self.configpath:
@@ -62,7 +62,13 @@ class BaseWMSFactory:
                 map_wms_srs = config.get('map', 'wms_srs')
 
         tmp_map = Map(0,0)
-        load_map(tmp_map, xmlfile, strict)
+        if xmlfile:
+            load_map(tmp_map, xmlfile, strict)
+        elif xmlstring:
+            load_map_from_string(tmp_map, xmlstring, strict, basepath)
+        else:
+            raise ServerConfigurationError("Mapnik configuration XML is not specified - 'xmlfile' and 'xmlstring' variables are empty.\
+Please set one of this variables to load mapnik map object.")
         # parse map level attributes
         if tmp_map.background:
             self.map_attributes['bgcolor'] = tmp_map.background
