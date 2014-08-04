@@ -5,3 +5,4 @@ Contributions from:
 Manel Clos
 Tom MacWright
 Dane Springmeyer
+Carsten Klein
