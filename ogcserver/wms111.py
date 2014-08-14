@@ -210,8 +210,8 @@ class ServiceHandler(WMSBaseServiceHandler):
                 if len(layer.wmsextrastyles) > 0:
                     extrastyles = layer.wmsextrastyles
                     if len(extrastyles) > 1:
-                        extrastyles = ('default',) + extrastyles
-                    for extrastyle in list(extrastyles):
+                        extrastyles = ['default'] + [x for x in extrastyles if x != 'default']
+                    for extrastyle in extrastyles:
                         style = ElementTree.Element('Style')
                         stylename = ElementTree.Element('Name')
                         stylename.text = to_unicode(extrastyle)
