@@ -1,0 +1,60 @@
+<!DOCTYPE Map>
+<Map srs="+init=epsg:23031" buffer-size="128" minimum-version="0.7.2">
+
+<Style name="simple-style">
+<Rule>
+	<PolygonSymbolizer fill-opacity="0.5" fill="#bee8ff"/></Rule>
+</Style>
+
+<Style name="another-style">
+<Rule>
+	<PolygonSymbolizer fill-opacity="0.25" fill="#ffffff"/></Rule>
+</Style>
+
+<!-- awkward style name, will be hidden by 'all-styles' default style
+     available with multi-style layers
+ -->
+<Style name="default">
+<Rule>
+	<PolygonSymbolizer fill-opacity="0.25" fill="#ffffff"/></Rule>
+</Style>
+
+<Layer name="single-style-layer">
+	<StyleName>simple-style</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+
+<Layer name="multi-style-layer">
+	<StyleName>simple-style</StyleName>
+	<StyleName>another-style</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+
+<Layer name="awkward-layer">
+	<StyleName>default</StyleName>
+	<StyleName>another-style</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+
+<Layer name="single-default-layer">
+	<StyleName>default</StyleName>
+
+	<Datasource>
+		<Parameter name="type">shape</Parameter>
+		<Parameter name="file">empty</Parameter>
+	</Datasource>
+</Layer>
+
+</Map>
