@@ -221,7 +221,7 @@ class ServiceHandler(WMSBaseServiceHandler):
                         style.append(stylename)
                         style.append(styletitle)
                         if style_count > 1 and extrastyle == 'default':
-                            styleabstract = ElementTree.Element('{http://www.opengis.net/wms}Abstract')
+                            styleabstract = ElementTree.Element('Abstract')
                             styleabstract.text = to_unicode('This layer\'s default style that combines all its other named styles.')
                             style.append(styleabstract)
                         layere.append(style)
