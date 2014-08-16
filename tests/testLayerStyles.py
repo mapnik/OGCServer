@@ -198,7 +198,6 @@ def test_map():
         
         check_map_styles(version, 2, 'multi-style-layer', '', ['simple-style', 'another-style'])
         check_map_styles(version, 2, 'multi-style-layer', 'default', ['simple-style', 'another-style'])
-
         check_map_styles(version, 2, 'multi-style-layer', 'simple-style', ['simple-style'])
         check_map_styles(version, 2, 'multi-style-layer', 'another-style', ['another-style'])
         check_map_styles(version, 2, 'multi-style-layer', 'invalid-style')
