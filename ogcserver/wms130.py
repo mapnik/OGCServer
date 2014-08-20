@@ -230,8 +230,12 @@ class ServiceHandler(WMSBaseServiceHandler):
                     layere.set('queryable', '1')
                 layere.append(layerexgbb)
                 layere.append(layerbbox)
-                if len(layer.wmsextrastyles) > 0:
-                    for extrastyle in [layer.wmsdefaultstyle] + list(layer.wmsextrastyles):
+                style_count = len(layer.wmsextrastyles)
+                if style_count > 0:
+                    extrastyles = layer.wmsextrastyles
+                    if style_count > 1:
+                        extrastyles = ['default'] + [x for x in extrastyles if x != 'default']
+                    for extrastyle in extrastyles:
                         style = ElementTree.Element('{http://www.opengis.net/wms}Style')
                         stylename = ElementTree.Element('{http://www.opengis.net/wms}Name')
                         stylename.text = to_unicode(extrastyle)
@@ -239,6 +243,10 @@ class ServiceHandler(WMSBaseServiceHandler):
                         styletitle.text = to_unicode(extrastyle)
                         style.append(stylename)
                         style.append(styletitle)
+                        if style_count > 1 and extrastyle == 'default':
+                            styleabstract = ElementTree.Element('{http://www.opengis.net/wms}Abstract')
+                            styleabstract.text = to_unicode('This layer\'s default style that combines all its other named styles.')
+                            style.append(styleabstract)
                         layere.append(style)
                 rootlayerelem.append(layere)
             self.capabilities = ElementTree.tostring(capetree,encoding='UTF-8')

@@ -160,6 +160,9 @@ Please set one of this variables to load mapnik map object.")
                 lyr_ = common.copy_layer(lyr)
                 lyr_.wms_srs = layer_wms_srs
                 self.register_layer(lyr_, aggregates_name, extrastyles=aggregates)
+                if 'default' in aggregates:
+                    sys.stderr.write("Warning: Multi-style layer '%s' contains a regular style named 'default'. \
+This style will effectively be hidden by the 'all styles' default style for multi-style layers.\n" % lyr_.name)
 
     def register_layer(self, layer, defaultstyle, extrastyles=()):
         layername = layer.name

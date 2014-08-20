@@ -467,6 +467,8 @@ class WMSBaseServiceHandler(BaseServiceHandler):
                         reqstyle = params['styles'][layerindex]
                     except IndexError:
                         reqstyle = ''
+                    if len(layer.wmsextrastyles) > 1 and reqstyle == 'default':
+                        reqstyle = ''
                     if reqstyle and reqstyle not in layer.wmsextrastyles:
                         raise OGCException('Invalid style "%s" requested for layer "%s".' % (reqstyle, layername), 'StyleNotDefined')
                     if not reqstyle:
