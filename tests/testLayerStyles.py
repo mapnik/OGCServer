@@ -128,7 +128,7 @@ def test_capabilities():
 
     conf, services = _wms_services('mapfile_styles.xml')
 
-    for version, ns in [('1.1.1', '{http://www.opengis.net/wms}'), ('1.3.0', '{http://www.opengis.net/wms}')]:
+    for version, ns in [('1.1.1', ''), ('1.3.0', '{http://www.opengis.net/wms}')]:
 
         caps = services[version].GetCapabilities({}).content
         styles = get_caps_styles(caps, ns)
