@@ -64,7 +64,7 @@ Installation
 - Test that the server code is available and installed properly by importing it within a
   python interpreter::
 
-  >>> from mapnik import ogcserver
+  >>> import ogcserver
   >>> # no error means proper installation
 
 - There is a sample python script called "wms.py" in the utils/ogcserver folder of the
@@ -113,7 +113,7 @@ For now this can be done by either loading an XML mapfile inside that script usi
 If you load your layers and styles using an existing XML mapfile the 'map_factory' module
 should look like::
 
-  from mapnik.ogcserver.WMS import BaseWMSFactory
+  from ogcserver.WMS import BaseWMSFactory
 
   class WMSFactory(BaseWMSFactory):
     def __init__(self):
@@ -124,7 +124,7 @@ should look like::
 Or if you want to define your layers and styles in pure python you might
 have a 'map_factory' more like::
 
-  from mapnik.ogcserver.WMS import BaseWMSFactory
+  from ogcserver.WMS import BaseWMSFactory
   from mapnik import *
 
   SHAPEFILE = '/path/to/world_borders.shp'
