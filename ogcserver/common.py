@@ -295,8 +295,10 @@ def copy_layer(obj):
     if hasattr(obj, 'toleranceunits'):
         lyr.toleranceunits = obj.toleranceunits
     lyr.srs = obj.srs
-    lyr.minzoom = obj.minzoom
-    lyr.maxzoom = obj.maxzoom
+    if hasattr(obj, 'minzoom'):
+        lyr.minzoom = obj.minzoom
+    if hasattr(obj, 'maxzoom'):
+      lyr.maxzoom = obj.maxzoom
     lyr.active = obj.active
     lyr.queryable = obj.queryable    
     lyr.clear_label_cache = obj.clear_label_cache
@@ -316,7 +318,8 @@ class WMSBaseServiceHandler(BaseServiceHandler):
     def GetMap(self, params):
         m = self._buildMap(params)
         im = Image(params['width'], params['height'])
-        render(m, im)
+        map_scale = self.mapfactory.map_scale if self.mapfactory is not None else 1
+        render(m, im, map_scale)
         format = PIL_TYPE_MAPPING[params['format']]
         if mapnik_version() >= 200300:
             # Mapnik 2.3 uses png8 as default, use png32 for backwards compatibility
@@ -537,7 +540,7 @@ class BaseExceptionHandler:
         e.text = message
         if code:
             e.set('code', code)
-        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree), status_code=404)
+        return Response(self.xmlmimetype, ElementTree.tostring(ogcexcetree, pretty_print=True), status_code=404)
 
     def inimagehandler(self, code, message, params):
         im = new('RGBA', (int(params['width']), int(params['height'])))
